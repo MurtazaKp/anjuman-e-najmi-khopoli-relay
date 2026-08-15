@@ -15,7 +15,8 @@ import {
   Lock,
   LogOut,
   ShieldAlert,
-  KeyRound
+  KeyRound,
+  Trash2
 } from "lucide-react";
 
 // Authorized Administrator Emails
@@ -35,6 +36,7 @@ export default function AdminPage() {
   const [generatingPasses, setGeneratingPasses] = useState(false);
   const [sendingWhatsapp, setSendingWhatsapp] = useState(false);
   const [syncingSheet, setSyncingSheet] = useState(false);
+  const [clearingStore, setClearingStore] = useState(false);
   const [actionMsg, setActionMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [whatsappLogs, setWhatsappLogs] = useState<any[]>([]);
@@ -204,6 +206,41 @@ export default function AdminPage() {
       }
     } catch (err: any) {
       setSendingWhatsapp(false);
+      setErrorMsg(err.message);
+    }
+  };
+
+  const handleClearStore = async () => {
+    const confirmClear = window.confirm(
+      "⚠️ ARE YOU SURE?\n\nThis will clear all family registrations and generated passes for this event in the live environment. This action cannot be undone."
+    );
+    if (!confirmClear) return;
+
+    try {
+      setClearingStore(true);
+      setActionMsg("");
+      setErrorMsg("");
+
+      const res = await fetch("/api/admin/clear-store", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: authenticatedEmail,
+          pin: ADMIN_VERIFICATION_PIN,
+        }),
+      });
+
+      const data = await res.json();
+      setClearingStore(false);
+
+      if (res.ok) {
+        setActionMsg("Store registrations and passes cleared successfully!");
+        fetchActiveEvent();
+      } else {
+        setErrorMsg(data.error || "Failed to clear store");
+      }
+    } catch (err: any) {
+      setClearingStore(false);
       setErrorMsg(err.message);
     }
   };
@@ -521,6 +558,34 @@ export default function AdminPage() {
             className="px-4 py-2 rounded-xl text-xs font-bold bg-navy-900 text-white hover:bg-navy-800 disabled:opacity-50 transition"
           >
             Close Registration
+          </button>
+        </div>
+      </section>
+
+      {/* 4. Database Maintenance & Store Reset */}
+      <section className="bg-white rounded-2xl p-6 border-2 border-red-200 premium-card space-y-4 shadow-sm">
+        <div className="border-b border-red-100 pb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 font-black text-red-950 text-base">
+            <Trash2 className="w-5 h-5 text-red-600" />
+            <span>Database Maintenance & Store Reset</span>
+          </div>
+          <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-red-100 text-red-900 rounded border border-red-200">
+            Admin Control
+          </span>
+        </div>
+
+        <p className="text-xs text-slate-600 leading-relaxed font-medium">
+          Allows authorized administrators to clear stored family registration records and passes for this event in the live environment.
+        </p>
+
+        <div className="pt-1">
+          <button
+            onClick={handleClearStore}
+            disabled={clearingStore}
+            className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-md transition flex items-center gap-2 border border-red-500"
+          >
+            <Trash2 className={`w-4 h-4 ${clearingStore ? "animate-spin" : ""}`} />
+            <span>{clearingStore ? "Clearing Store..." : "Clear All Store Registrations"}</span>
           </button>
         </div>
       </section>
