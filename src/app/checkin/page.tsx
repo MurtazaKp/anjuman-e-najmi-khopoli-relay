@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   QrCode,
   CheckCircle2,
@@ -8,19 +8,32 @@ import {
   XCircle,
   Search,
   RotateCcw,
-  Clock
+  Clock,
+  Radio,
+  Camera,
+  CameraOff
 } from "lucide-react";
+import { Html5Qrcode } from "html5-qrcode";
 
 export default function StaffCheckinPage() {
   const [qrInput, setQrInput] = useState("");
   const [scanning, setScanning] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);
   const [scanResult, setScanResult] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
 
-  const handleScanOrSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    const token = qrInput.trim();
-    if (!token) return;
+  useEffect(() => {
+    // Keep input field focused for continuous RFID / USB Barcode card scanning
+    if (inputRef.current && !cameraActive) {
+      inputRef.current.focus();
+    }
+  }, [scanResult, errorMsg, scanning, cameraActive]);
+
+  const verifyPassToken = async (token: string) => {
+    const cleanToken = token.trim();
+    if (!cleanToken) return;
 
     setScanning(true);
     setScanResult(null);
@@ -30,7 +43,7 @@ export default function StaffCheckinPage() {
       const res = await fetch("/api/passes/checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ qrToken: token }),
+        body: JSON.stringify({ qrToken: cleanToken }),
       });
 
       const data = await res.json();
@@ -38,13 +51,62 @@ export default function StaffCheckinPage() {
 
       if (!res.ok && !data.status) {
         setErrorMsg(data.error || "Failed to verify pass");
+        setQrInput("");
         return;
       }
 
       setScanResult(data);
+      setQrInput("");
     } catch (err: any) {
       setScanning(false);
       setErrorMsg(err.message || "Network error");
+      setQrInput("");
+    }
+  };
+
+  const handleScanOrSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    verifyPassToken(qrInput);
+  };
+
+  const startCamera = async () => {
+    setCameraActive(true);
+    setErrorMsg("");
+    setScanResult(null);
+
+    setTimeout(() => {
+      try {
+        const qrScanner = new Html5Qrcode("reader");
+        html5QrCodeRef.current = qrScanner;
+
+        qrScanner.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 220, height: 220 } },
+          (decodedText) => {
+            verifyPassToken(decodedText);
+            stopCamera();
+          },
+          () => {}
+        ).catch((err) => {
+          console.error("Camera error:", err);
+          setErrorMsg("Could not access phone camera. Please grant camera permission.");
+          setCameraActive(false);
+        });
+      } catch (err: any) {
+        setErrorMsg("Camera initialization failed: " + err.message);
+        setCameraActive(false);
+      }
+    }, 300);
+  };
+
+  const stopCamera = () => {
+    if (html5QrCodeRef.current) {
+      html5QrCodeRef.current.stop().catch(() => {}).finally(() => {
+        setCameraActive(false);
+        html5QrCodeRef.current = null;
+      });
+    } else {
+      setCameraActive(false);
     }
   };
 
@@ -52,6 +114,7 @@ export default function StaffCheckinPage() {
     setQrInput("");
     setScanResult(null);
     setErrorMsg("");
+    if (inputRef.current && !cameraActive) inputRef.current.focus();
   };
 
   return (
@@ -61,27 +124,64 @@ export default function StaffCheckinPage() {
         <div className="w-12 h-12 rounded-full bg-gold-600 text-white flex items-center justify-center mx-auto shadow-md border border-gold-400/40">
           <QrCode className="w-6 h-6" />
         </div>
-        <h1 className="text-xl font-extrabold tracking-tight text-white">
-          Entrance Check-in Counter
+        <h1 className="text-xl font-extrabold tracking-tight text-white flex items-center justify-center gap-2">
+          <span>Entrance Check-in Counter</span>
         </h1>
         <p className="text-xs text-amber-200">
           Khopoli Relay Centre Staff Entry Verification Portal
         </p>
       </div>
 
-      {/* QR Code / ITS Scan Input Form */}
+      {/* QR Code & ITS Search / Scan Input Form */}
       <div className="bg-white rounded-2xl p-6 border border-cream-300 card-shadow space-y-4">
+        {/* Phone Camera Scanner Button */}
+        <div className="flex items-center justify-between border-b border-cream-200 pb-3">
+          <span className="text-xs font-bold uppercase tracking-wider text-navy-900">
+            Scan Method
+          </span>
+
+          {!cameraActive ? (
+            <button
+              onClick={startCamera}
+              className="px-4 py-2 rounded-xl bg-navy-900 hover:bg-navy-950 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm border border-gold-500/40"
+            >
+              <Camera className="w-4 h-4 text-gold-400" />
+              <span>Use Phone Camera</span>
+            </button>
+          ) : (
+            <button
+              onClick={stopCamera}
+              className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+            >
+              <CameraOff className="w-4 h-4" />
+              <span>Close Camera</span>
+            </button>
+          )}
+        </div>
+
+        {/* Live Video Viewport for Phone Camera */}
+        {cameraActive && (
+          <div className="space-y-2 text-center p-3 bg-navy-950 rounded-2xl border-2 border-gold-600 shadow-inner">
+            <p className="text-xs text-gold-400 font-bold flex items-center justify-center gap-1">
+              <Camera className="w-4 h-4 animate-bounce" />
+              <span>Point Phone Camera at Pass QR Code</span>
+            </p>
+            <div id="reader" className="w-full overflow-hidden rounded-xl bg-black min-h-[250px]" />
+          </div>
+        )}
+
         <form onSubmit={handleScanOrSubmit} className="space-y-3">
           <label className="block text-xs font-bold uppercase tracking-wider text-navy-900">
-            Scan QR Code or Enter Member ITS ID
+            Search Member ITS ID or Pass QR Code
           </label>
           <div className="flex gap-2">
             <input
+              ref={inputRef}
               type="text"
-              placeholder="Scan QR token or enter ITS ID..."
+              placeholder="Enter ITS ID or scan QR token..."
               value={qrInput}
               onChange={(e) => setQrInput(e.target.value)}
-              className="flex-1 px-4 py-3 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none text-base font-medium font-mono text-slate-900"
+              className="flex-1 px-4 py-3 rounded-xl border-2 border-navy-900 focus:ring-2 focus:ring-gold-500 focus:outline-none text-base font-bold font-mono text-navy-950 bg-cream-50"
               autoFocus
               required
             />

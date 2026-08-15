@@ -474,11 +474,19 @@ export function getFamilyPassesData(tokenOrIts: string) {
  */
 export function checkInPassData(qrTokenOrIts: string) {
   const clean = qrTokenOrIts.trim();
+  const cleanDigits = clean.replace(/\D/g, "");
   const store = getStore();
 
-  let pass = store.passes.find((p) => p.qrToken === clean);
+  let pass: PassData | undefined;
   let member: FamilyMemberData | undefined;
   let family: FamilyData | undefined;
+
+  // 1. Match by QR Token
+  pass = store.passes.find(
+    (p) =>
+      p.qrToken === clean ||
+      (cleanDigits && p.qrToken === `KRC-URS1448H-${cleanDigits}`)
+  );
 
   if (pass) {
     for (const f of store.families) {
@@ -490,22 +498,34 @@ export function checkInPassData(qrTokenOrIts: string) {
       }
     }
   } else {
-    // Check by member ITS ID
+    // 2. Match by Member ITS ID directly
     for (const f of store.families) {
-      const found = f.members.find((m) => m.itsId === clean);
+      const found = f.members.find(
+        (m) => m.itsId === clean || (cleanDigits && m.itsId === cleanDigits)
+      );
       if (found) {
         member = found;
         family = f;
         pass = store.passes.find((p) => p.memberId === member?.id);
+        
+        // Auto-generate pass if missing
         if (!pass) {
-          throw new Error("Digital pass has not been issued yet by event administration.");
+          pass = {
+            id: `pass-${member.id}`,
+            eventId: family.eventId,
+            memberId: member.id,
+            qrToken: `KRC-URS1448H-${member.itsId}`,
+            status: "ISSUED",
+            createdAt: new Date().toISOString(),
+          };
+          store.passes.push(pass);
         }
         break;
       }
     }
   }
 
-  if (!pass || !member || !family) {
+  if (!member || !family || !pass) {
     return {
       status: "INVALID",
       message: "Pass not found. Invalid QR token or ITS ID.",

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { QRCodeSVG } from "qrcode.react";
+import QRCode from "qrcode";
 import {
   Calendar,
   MapPin,
@@ -14,6 +14,31 @@ import {
   Download,
   Printer
 } from "lucide-react";
+
+function QrCodeDisplay({ value, size = 180 }: { value: string; size?: number }) {
+  const [dataUrl, setDataUrl] = useState<string>("");
+
+  useEffect(() => {
+    if (!value) return;
+    QRCode.toDataURL(value, { width: size, margin: 1 })
+      .then((url) => setDataUrl(url))
+      .catch((err) => console.error("QR Code Error:", err));
+  }, [value, size]);
+
+  if (!dataUrl) {
+    return <div className="w-[180px] h-[180px] bg-slate-100 rounded-2xl animate-pulse mx-auto" />;
+  }
+
+  return (
+    <img
+      src={dataUrl}
+      alt="Digital Pass QR Code"
+      width={size}
+      height={size}
+      className="mx-auto"
+    />
+  );
+}
 
 export default function PassesPage() {
   const params = useParams();
@@ -218,11 +243,9 @@ export default function PassesPage() {
               <div className="py-2">
                 {activeMemberPass.pass && activeMemberPass.pass.qrToken ? (
                   <div className="inline-block p-4 bg-white rounded-2xl border-2 border-navy-900 shadow-md space-y-2">
-                    <QRCodeSVG
+                    <QrCodeDisplay
                       value={activeMemberPass.pass.qrToken}
                       size={180}
-                      level="H"
-                      includeMargin={true}
                     />
                     <p className="text-[10px] font-mono tracking-widest text-slate-600 font-bold uppercase">
                       {activeMemberPass.pass.qrToken}
