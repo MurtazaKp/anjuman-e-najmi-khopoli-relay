@@ -1,0 +1,63 @@
+{
+  "events": [
+    {
+      "id": "event-urs-1448h",
+      "slug": "urs-1448h",
+      "name": "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H",
+      "description": "Urs Mubarak of Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. organized by Anjuman E Najmi Khopoli.",
+      "date": "16th Rabi al-Awwal 1448H",
+      "time": "9:00 AM Onwards",
+      "venue": "Maharaja Lawns - Khopoli",
+      "location": "L. M. Sable Nagar, Old Mumbai-Pune Highway, Dist. Khopoli, Maharashtra 410203",
+      "mapUrl": "https://maps.google.com/?q=Maharaja+Lawns+Khopoli",
+      "latitude": 18.7905,
+      "longitude": 73.3444,
+      "registrationStart": "2026-08-14T20:00:00.000Z",
+      "registrationEnd": "2026-09-14T20:00:00.000Z",
+      "status": "REGISTRATION_OPEN",
+      "isCurrent": true
+    }
+  ],
+  "families": [
+    {
+      "id": "fam-1786794854894-367",
+      "eventId": "event-urs-1448h",
+      "hofName": "Murtaza Khopoliwala",
+      "hofItsId": "50499557",
+      "mobileNumber": "9403825153",
+      "mauze": "Lonavala",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "Yes, Jami ne Jaisu",
+      "niyazContribution": "121000",
+      "passLinkToken": "pass-1786794854894-52kmzu",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-08-15T11:54:14.895Z",
+      "members": [
+        {
+          "id": "mem-fam-1786794854894-367-1",
+          "familyId": "fam-1786794854894-367",
+          "eventId": "event-urs-1448h",
+          "itsId": "50499557",
+          "name": "Murtaza Khopoliwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-08-15T11:54:14.895Z"
+        },
+        {
+          "id": "mem-fam-1786794854894-367-2",
+          "familyId": "fam-1786794854894-367",
+          "eventId": "event-urs-1448h",
+          "itsId": "50499555",
+          "name": "Fatema Khopoliwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": false,
+          "createdAt": "2026-08-15T11:54:14.895Z"
+        }
+      ]
+    }
+  ],
+  "passes": []
+}

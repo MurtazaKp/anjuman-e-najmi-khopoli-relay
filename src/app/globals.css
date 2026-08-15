@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-canvas: #faf7f2;
+  --navy-dark: #0f1f38;
+  --navy-primary: #1b365d;
+  --gold-accent: #c68a36;
+  --gold-border: #e2d3b7;
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: #11223e;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+}
+
+/* Custom UI Utilities */
+.navy-header {
+  background: linear-gradient(135deg, #0a1628 0%, #11223e 50%, #1b365d 100%);
+}
+
+.gold-pill-badge {
+  background: linear-gradient(135deg, #d4943c 0%, #c68a36 100%);
+  color: #ffffff;
+}
+
+.premium-card {
+  background-color: #ffffff;
+  border: 1.5px solid #e2d3b7;
+  box-shadow: 0 4px 20px -2px rgba(27, 54, 93, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+}
+
+.btn-primary-navy {
+  background-color: #11223e;
+  color: #ffffff;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary-navy:hover {
+  background-color: #1b365d;
+}
+
+.btn-gold {
+  background-color: #c68a36;
+  color: #ffffff;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-gold:hover {
+  background-color: #b3782b;
+}
+
+/* Print / PDF Export Styling */
+@page {
+  size: auto;
+  margin: 10mm;
+}
+
+@media print {
+  @page {
+    margin: 10mm;
+  }
+  body {
+    background-color: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  header, footer, nav, button.no-print, .no-print {
+    display: none !important;
+  }
+  .printable-pass-card {
+    border: 2px solid #0f1f38 !important;
+    box-shadow: none !important;
+    max-width: 500px !important;
+    margin: 20px auto !important;
+    page-break-inside: avoid !important;
+  }
+}
