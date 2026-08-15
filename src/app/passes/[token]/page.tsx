@@ -60,16 +60,26 @@ export default function PassesPage() {
 
   if (error || !family) {
     return (
-      <div className="max-w-md mx-auto my-8 p-6 bg-white rounded-2xl border border-red-200 premium-card text-center space-y-4">
+      <div className="max-w-md mx-auto my-8 p-6 bg-white rounded-2xl border border-red-200 premium-card text-center space-y-4 shadow-lg">
         <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
-        <h2 className="text-xl font-bold text-navy-950">Passes Not Found</h2>
-        <p className="text-xs text-slate-600 font-medium">{error || "No registration found for this link."}</p>
-        <a
-          href="/"
-          className="inline-block px-5 py-2.5 rounded-xl bg-navy-900 text-white font-bold text-xs"
-        >
-          Return to Homepage
-        </a>
+        <h2 className="text-xl font-black text-navy-950">No Registration Found</h2>
+        <p className="text-xs text-slate-600 font-medium leading-relaxed">
+          We couldn't find a pass registered under <strong>"{token}"</strong>. Please verify your ITS ID / Mobile Number or register your family below.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-2.5 pt-2 justify-center">
+          <a
+            href="/register"
+            className="px-5 py-3 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-1.5 border border-gold-400"
+          >
+            <span>Register Family Now</span>
+          </a>
+          <a
+            href="/"
+            className="px-5 py-3 rounded-xl bg-cream-200 hover:bg-cream-300 text-navy-950 font-bold text-xs border border-cream-300 transition flex items-center justify-center"
+          >
+            <span>Back to Home</span>
+          </a>
+        </div>
       </div>
     );
   }

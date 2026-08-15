@@ -414,27 +414,53 @@ export function generatePassesData(eventId: string) {
 }
 
 /**
- * Get family passes by token or HOF ITS ID
+ * Fetch family pass details by Pass Token, HOF ITS ID, Member ITS ID, or Mobile Number
  */
 export function getFamilyPassesData(tokenOrIts: string) {
   const clean = tokenOrIts.trim();
+  const cleanDigits = clean.replace(/\D/g, "");
   const store = getStore();
 
   const family = store.families.find(
-    (f) => f.passLinkToken === clean || f.hofItsId === clean
+    (f) =>
+      f.passLinkToken === clean ||
+      f.hofItsId === clean ||
+      (cleanDigits && f.hofItsId === cleanDigits) ||
+      (cleanDigits && f.mobileNumber.replace(/\D/g, "") === cleanDigits) ||
+      f.members.some(
+        (m) => m.itsId === clean || (cleanDigits && m.itsId === cleanDigits)
+      )
   );
 
   if (!family) return null;
 
   const event = store.events.find((e) => e.id === family.eventId);
 
+  // Ensure passes exist for all family members (auto-generate if missing)
+  let updatedStore = false;
   const membersWithPasses = family.members.map((m) => {
-    const pass = store.passes.find((p) => p.memberId === m.id);
+    let pass = store.passes.find((p) => p.memberId === m.id);
+    if (!pass) {
+      pass = {
+        id: `pass-${m.id}`,
+        eventId: family.eventId,
+        memberId: m.id,
+        qrToken: `KRC-URS1448H-${m.itsId}`,
+        status: "ISSUED",
+        createdAt: new Date().toISOString(),
+      };
+      store.passes.push(pass);
+      updatedStore = true;
+    }
     return {
       ...m,
-      pass: pass || null,
+      pass,
     };
   });
+
+  if (updatedStore) {
+    saveStore(store);
+  }
 
   return {
     ...family,

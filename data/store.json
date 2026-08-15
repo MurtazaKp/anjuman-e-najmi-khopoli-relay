@@ -14,10 +14,67 @@
       "longitude": 73.3444,
       "registrationStart": "2026-08-14T20:00:00.000Z",
       "registrationEnd": "2026-09-14T20:00:00.000Z",
-      "status": "REGISTRATION_OPEN",
+      "status": "REGISTRATION_CLOSED",
       "isCurrent": true
     }
   ],
-  "families": [],
-  "passes": []
+  "families": [
+    {
+      "id": "fam-1786804462976-883",
+      "eventId": "event-urs-1448h",
+      "hofName": "Aliasgar Khopoliwala",
+      "hofItsId": "20393833",
+      "mobileNumber": "9403825153",
+      "mauze": "Pune",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "Yes, Jami ne Jaisu",
+      "niyazContribution": "14000",
+      "passLinkToken": "pass-1786804462976-a7migo",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-08-15T14:34:22.980Z",
+      "members": [
+        {
+          "id": "mem-fam-1786804462976-883-1",
+          "familyId": "fam-1786804462976-883",
+          "eventId": "event-urs-1448h",
+          "itsId": "20393833",
+          "name": "Aliasgar Khopoliwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-08-15T14:34:22.978Z"
+        },
+        {
+          "id": "mem-fam-1786804462976-883-2",
+          "familyId": "fam-1786804462976-883",
+          "eventId": "event-urs-1448h",
+          "itsId": "50499560",
+          "name": "Tasneem Khopoliwala",
+          "gender": "Female",
+          "type": "Adult",
+          "isHof": false,
+          "createdAt": "2026-08-15T14:34:22.978Z"
+        }
+      ]
+    }
+  ],
+  "passes": [
+    {
+      "id": "pass-mem-fam-1786804462976-883-1",
+      "eventId": "event-urs-1448h",
+      "memberId": "mem-fam-1786804462976-883-1",
+      "qrToken": "KRC-URS1448H-20393833",
+      "status": "ISSUED",
+      "createdAt": "2026-08-15T14:41:10.357Z"
+    },
+    {
+      "id": "pass-mem-fam-1786804462976-883-2",
+      "eventId": "event-urs-1448h",
+      "memberId": "mem-fam-1786804462976-883-2",
+      "qrToken": "KRC-URS1448H-50499560",
+      "status": "ISSUED",
+      "createdAt": "2026-08-15T14:41:10.357Z"
+    }
+  ]
 }
