@@ -436,31 +436,13 @@ export function getFamilyPassesData(tokenOrIts: string) {
 
   const event = store.events.find((e) => e.id === family.eventId);
 
-  // Ensure passes exist for all family members (auto-generate if missing)
-  let updatedStore = false;
   const membersWithPasses = family.members.map((m) => {
-    let pass = store.passes.find((p) => p.memberId === m.id);
-    if (!pass) {
-      pass = {
-        id: `pass-${m.id}`,
-        eventId: family.eventId,
-        memberId: m.id,
-        qrToken: `KRC-URS1448H-${m.itsId}`,
-        status: "ISSUED",
-        createdAt: new Date().toISOString(),
-      };
-      store.passes.push(pass);
-      updatedStore = true;
-    }
+    const pass = store.passes.find((p) => p.memberId === m.id);
     return {
       ...m,
-      pass,
+      pass: pass || null,
     };
   });
-
-  if (updatedStore) {
-    saveStore(store);
-  }
 
   return {
     ...family,
