@@ -18,46 +18,6 @@
       "isCurrent": true
     }
   ],
-  "families": [
-    {
-      "id": "fam-1786794854894-367",
-      "eventId": "event-urs-1448h",
-      "hofName": "Murtaza Khopoliwala",
-      "hofItsId": "50499557",
-      "mobileNumber": "9403825153",
-      "mauze": "Lonavala",
-      "transportMode": "Car",
-      "rajabRozaCount": 0,
-      "niyazJaman": "Yes, Jami ne Jaisu",
-      "niyazContribution": "121000",
-      "passLinkToken": "pass-1786794854894-52kmzu",
-      "whatsappStatus": "PENDING",
-      "createdAt": "2026-08-15T11:54:14.895Z",
-      "members": [
-        {
-          "id": "mem-fam-1786794854894-367-1",
-          "familyId": "fam-1786794854894-367",
-          "eventId": "event-urs-1448h",
-          "itsId": "50499557",
-          "name": "Murtaza Khopoliwala",
-          "gender": "Male",
-          "type": "Adult",
-          "isHof": true,
-          "createdAt": "2026-08-15T11:54:14.895Z"
-        },
-        {
-          "id": "mem-fam-1786794854894-367-2",
-          "familyId": "fam-1786794854894-367",
-          "eventId": "event-urs-1448h",
-          "itsId": "50499555",
-          "name": "Fatema Khopoliwala",
-          "gender": "Male",
-          "type": "Adult",
-          "isHof": false,
-          "createdAt": "2026-08-15T11:54:14.895Z"
-        }
-      ]
-    }
-  ],
+  "families": [],
   "passes": []
 }
