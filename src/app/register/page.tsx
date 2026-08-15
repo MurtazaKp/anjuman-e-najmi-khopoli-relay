@@ -118,6 +118,16 @@ export default function RegisterPage() {
       return;
     }
 
+    if (hofItsId.trim().length !== 8) {
+      setErrorMsg("HOF ITS ID must be exactly 8 digits.");
+      return;
+    }
+
+    if (mobileNumber.trim().length !== 10) {
+      setErrorMsg("Mobile Number must be exactly 10 digits.");
+      return;
+    }
+
     if (mauze === "Other" && !mauzeOther.trim()) {
       setErrorMsg("Please specify your Mauze name.");
       return;
@@ -166,6 +176,11 @@ export default function RegisterPage() {
     }
 
     const cleanIts = memberItsId.trim();
+
+    if (cleanIts.length !== 8) {
+      setErrorMsg("Family Member ITS ID must be exactly 8 digits.");
+      return;
+    }
 
     if (cleanIts === hofItsId.trim()) {
       setErrorMsg("This ITS ID matches the HOF's ITS ID.");
@@ -450,24 +465,28 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-navy-900 mb-1">HOF ITS ID *</label>
+                <label className="block text-xs font-bold text-navy-900 mb-1">HOF ITS ID (8 Digits) *</label>
                 <input
                   type="text"
                   placeholder="8-digit ITS ID"
                   value={hofItsId}
-                  onChange={(e) => setHofItsId(e.target.value)}
+                  onChange={(e) => setHofItsId(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                  maxLength={8}
+                  pattern="\d{8}"
                   className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white tracking-wide"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-navy-900 mb-1">Mobile Number (WhatsApp) *</label>
+                <label className="block text-xs font-bold text-navy-900 mb-1">Mobile Number (10 Digits) *</label>
                 <input
                   type="tel"
-                  placeholder="e.g. 9820098200"
+                  placeholder="10-digit mobile number"
                   value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value)}
+                  onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                  maxLength={10}
+                  pattern="\d{10}"
                   className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white"
                   required
                 />
@@ -775,13 +794,15 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-navy-900 mb-1">ITS ID *</label>
+                <label className="block text-xs font-bold text-navy-900 mb-1">ITS ID (8 Digits) *</label>
                 <input
                   type="text"
                   placeholder="8-digit ITS ID"
                   value={memberItsId}
-                  onChange={(e) => setMemberItsId(e.target.value)}
-                  className="w-full px-4 py-2 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white"
+                  onChange={(e) => setMemberItsId(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                  maxLength={8}
+                  pattern="\d{8}"
+                  className="w-full px-4 py-2 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white tracking-wide"
                   required
                 />
               </div>
