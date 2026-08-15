@@ -444,10 +444,15 @@ export function getFamilyPassesData(tokenOrIts: string) {
     };
   });
 
+  const matchedMember = family.members.find(
+    (m) => m.itsId === clean || (cleanDigits && m.itsId === cleanDigits)
+  );
+
   return {
     ...family,
     event,
     members: membersWithPasses,
+    matchedMemberId: matchedMember?.id || null,
   };
 }
 

@@ -48,6 +48,7 @@ export default function PassesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeMemberPass, setActiveMemberPass] = useState<any>(null);
+  const [capturingBlocked, setCapturingBlocked] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -58,8 +59,12 @@ export default function PassesPage() {
         setLoading(false);
         if (data.family) {
           setFamily(data.family);
-          const hofMember = data.family.members?.find((m: any) => m.isHof) || data.family.members?.[0];
-          if (hofMember) setActiveMemberPass(hofMember);
+          const cleanToken = token.trim();
+          const matchedMember = data.family.members?.find(
+            (m: any) => m.id === data.family.matchedMemberId || m.itsId === cleanToken
+          );
+          const defaultMember = matchedMember || data.family.members?.find((m: any) => m.isHof) || data.family.members?.[0];
+          if (defaultMember) setActiveMemberPass(defaultMember);
         } else {
           setError("Family passes not found. Please check your link or ITS ID.");
         }
@@ -70,9 +75,29 @@ export default function PassesPage() {
       });
   }, [token]);
 
-  const handleDownloadPdf = () => {
-    window.print();
-  };
+  // Mobile Screenshot & App Switcher Anti-Capture Listeners
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setCapturingBlocked(true);
+      } else {
+        setTimeout(() => setCapturingBlocked(false), 600);
+      }
+    };
+
+    const handleBlur = () => {
+      setCapturingBlocked(true);
+      setTimeout(() => setCapturingBlocked(false), 600);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleBlur);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleBlur);
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -200,7 +225,11 @@ export default function PassesPage() {
         {/* Right Column: Active Pass Details or Pending Banner */}
         <div className="md:col-span-2">
           {activeMemberPass ? (
-            <div className="printable-pass-card bg-white rounded-3xl p-6 border-2 border-navy-900 shadow-xl space-y-5 text-center relative overflow-hidden">
+            <div
+              onContextMenu={(e) => e.preventDefault()}
+              style={{ WebkitTouchCallout: "none" }}
+              className="printable-pass-card bg-white rounded-3xl p-6 border-2 border-navy-900 shadow-xl space-y-5 text-center relative overflow-hidden select-none"
+            >
               {/* Event Header */}
               <div className="navy-header -mx-6 -mt-6 p-4 text-white space-y-1 border-b-2 border-gold-600">
                 <p className="text-[10px] font-black tracking-widest uppercase text-gold-400">
@@ -242,7 +271,9 @@ export default function PassesPage() {
               {/* QR Code Section or Pending Banner */}
               <div className="py-2">
                 {activeMemberPass.pass && activeMemberPass.pass.qrToken ? (
-                  <div className="inline-block p-4 bg-white rounded-2xl border-2 border-navy-900 shadow-md space-y-2">
+                  <div className={`inline-block p-4 bg-white rounded-2xl border-2 border-navy-900 shadow-md space-y-2 transition-all duration-200 ${
+                    capturingBlocked ? "opacity-0 scale-95 pointer-events-none" : "opacity-100"
+                  }`}>
                     <QrCodeDisplay
                       value={activeMemberPass.pass.qrToken}
                       size={180}
@@ -264,7 +295,7 @@ export default function PassesPage() {
                 )}
               </div>
 
-              {/* Status & Download PDF Button */}
+              {/* Status & Security Badge */}
               <div className="space-y-3 pt-1">
                 <div className="flex flex-wrap items-center justify-center gap-3">
                   {activeMemberPass.pass?.status === "CHECKED_IN" && (
@@ -279,23 +310,18 @@ export default function PassesPage() {
                       Check back after pass generation is completed by admin.
                     </p>
                   )}
-
-                  {activeMemberPass.pass && (
-                    <button
-                      onClick={handleDownloadPdf}
-                      className="no-print px-5 py-2.5 rounded-xl bg-navy-900 hover:bg-navy-950 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 border border-gold-500/40"
-                      title="Download Digital Pass in PDF Format"
-                    >
-                      <Printer className="w-4 h-4 text-gold-400" />
-                      <span>Download Pass as PDF</span>
-                    </button>
-                  )}
                 </div>
 
                 {activeMemberPass.pass && (
-                  <p className="text-xs text-slate-600 font-medium">
-                    Scan this QR code at the entrance counter for entry check-in.
-                  </p>
+                  <div className="space-y-1">
+                    <p className="text-xs text-slate-600 font-bold flex items-center justify-center gap-1.5">
+                      <ShieldAlert className="w-4 h-4 text-navy-900" />
+                      <span>Protected Live Pass · Present on Phone Screen at Counter</span>
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-medium">
+                      Screenshots & Printing Disabled for Event Security
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
