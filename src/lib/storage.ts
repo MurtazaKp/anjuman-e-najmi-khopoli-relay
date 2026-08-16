@@ -369,10 +369,11 @@ export async function registerFamilyData(
     })),
   };
 
-  await syncToGoogleSheetWebhook({
+  // Fire-and-forget background sync to Google Sheets (non-blocking for instant sub-second response)
+  syncToGoogleSheetWebhook({
     eventName: event.name,
     family: formattedGroup,
-  });
+  }).catch((err) => console.error("[Google Sheet Webhook Error]", err));
 
   return newFamily;
 }

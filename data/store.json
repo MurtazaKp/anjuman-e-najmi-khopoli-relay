@@ -14,9 +14,8 @@
       "longitude": 73.3444,
       "registrationStart": "2026-08-14T20:00:00.000Z",
       "registrationEnd": "2026-09-14T20:00:00.000Z",
-      "status": "PASSES_ISSUED",
-      "isCurrent": true,
-      "passIssueDate": "2026-08-16T14:21:48.985Z"
+      "status": "REGISTRATION_OPEN",
+      "isCurrent": true
     }
   ],
   "families": [],

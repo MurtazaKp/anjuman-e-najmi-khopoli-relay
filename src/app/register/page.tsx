@@ -19,7 +19,8 @@ import {
   Heart,
   PhoneCall,
   Info,
-  Lock
+  Lock,
+  Loader2
 } from "lucide-react";
 import DigitalQrCard from "@/components/DigitalQrCard";
 
@@ -531,10 +532,19 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={itsChecking}
-            className="w-full mt-4 py-3 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-black text-base transition shadow-md flex items-center justify-center gap-2 border border-gold-400/40"
+            className="w-full mt-4 py-3 rounded-xl bg-gold-600 hover:bg-gold-700 disabled:bg-gold-600/70 disabled:cursor-not-allowed text-white font-black text-base transition shadow-md flex items-center justify-center gap-2 border border-gold-400/40"
           >
-            {itsChecking ? "Verifying ITS ID..." : "Continue to Add Family Members"}
-            <ArrowRight className="w-5 h-5 text-white" />
+            {itsChecking ? (
+              <>
+                <Loader2 className="w-5 h-5 text-white animate-spin" />
+                <span>Verifying ITS ID...</span>
+              </>
+            ) : (
+              <>
+                <span>Continue to Add Family Members</span>
+                <ArrowRight className="w-5 h-5 text-white" />
+              </>
+            )}
           </button>
         </form>
       )}
@@ -771,10 +781,19 @@ export default function RegisterPage() {
               type="button"
               onClick={handleFinalSubmit}
               disabled={submitting}
-              className="flex-1 py-3.5 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-black text-base transition shadow-lg flex items-center justify-center gap-2 border border-gold-400/40"
+              className="flex-1 py-3.5 rounded-xl bg-gold-600 hover:bg-gold-700 disabled:bg-gold-600/70 disabled:cursor-not-allowed text-white font-black text-base transition shadow-lg flex items-center justify-center gap-2 border border-gold-400/40"
             >
-              {submitting ? "Submitting Registration..." : "Complete Registration"}
-              <CheckCircle2 className="w-5 h-5 text-white" />
+              {submitting ? (
+                <>
+                  <Loader2 className="w-5 h-5 text-white animate-spin" />
+                  <span>Submitting Registration...</span>
+                </>
+              ) : (
+                <>
+                  <span>Complete Registration</span>
+                  <CheckCircle2 className="w-5 h-5 text-white" />
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -858,9 +877,16 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={itsChecking}
-                  className="px-5 py-2 rounded-xl bg-gold-600 hover:bg-gold-700 text-white text-xs font-bold shadow-sm"
+                  className="px-5 py-2 rounded-xl bg-gold-600 hover:bg-gold-700 disabled:bg-gold-600/70 disabled:cursor-not-allowed text-white text-xs font-bold shadow-sm flex items-center gap-1.5"
                 >
-                  {itsChecking ? "Verifying..." : "Save Member"}
+                  {itsChecking ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 text-white animate-spin" />
+                      <span>Verifying...</span>
+                    </>
+                  ) : (
+                    <span>Save Member</span>
+                  )}
                 </button>
               </div>
             </form>
