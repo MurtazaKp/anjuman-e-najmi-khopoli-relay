@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import QRCode from "qrcode";
 import {
   Calendar,
   MapPin,
@@ -11,34 +10,14 @@ import {
   ChevronRight,
   Clock,
   ShieldAlert,
-  Download,
-  Printer
+  ExternalLink,
+  Car,
+  Utensils,
+  Heart,
+  PhoneCall,
+  User,
+  Navigation
 } from "lucide-react";
-
-function QrCodeDisplay({ value, size = 180 }: { value: string; size?: number }) {
-  const [dataUrl, setDataUrl] = useState<string>("");
-
-  useEffect(() => {
-    if (!value) return;
-    QRCode.toDataURL(value, { width: size, margin: 1 })
-      .then((url) => setDataUrl(url))
-      .catch((err) => console.error("QR Code Error:", err));
-  }, [value, size]);
-
-  if (!dataUrl) {
-    return <div className="w-[180px] h-[180px] bg-slate-100 rounded-2xl animate-pulse mx-auto" />;
-  }
-
-  return (
-    <img
-      src={dataUrl}
-      alt="Digital Pass QR Code"
-      width={size}
-      height={size}
-      className="mx-auto"
-    />
-  );
-}
 
 export default function PassesPage() {
   const params = useParams();
@@ -251,7 +230,7 @@ export default function PassesPage() {
                 </div>
               </div>
 
-              {/* Member Details */}
+              {/* Member Pass Details Header */}
               <div className="space-y-1 pt-2">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cream-100 border border-cream-300 text-xs font-bold text-navy-900 mb-2">
                   <span>ITS ID: {activeMemberPass.itsId}</span>
@@ -266,63 +245,91 @@ export default function PassesPage() {
                 <p className="text-xs text-slate-600 font-medium">
                   {activeMemberPass.isHof ? "Head of Family (HOF)" : `Family Member of ${family.hofName}`}
                 </p>
-              </div>
 
-              {/* QR Code Section or Pending Banner */}
-              <div className="py-2">
-                {activeMemberPass.pass && activeMemberPass.pass.qrToken ? (
-                  <div className={`inline-block p-4 bg-white rounded-2xl border-2 border-navy-900 shadow-md space-y-2 transition-all duration-200 ${
-                    capturingBlocked ? "opacity-0 scale-95 pointer-events-none" : "opacity-100"
-                  }`}>
-                    <QrCodeDisplay
-                      value={activeMemberPass.pass.qrToken}
-                      size={180}
-                    />
-                    <p className="text-[10px] font-mono tracking-widest text-slate-600 font-bold uppercase">
-                      {activeMemberPass.pass.qrToken}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="p-6 rounded-2xl bg-amber-50 border border-amber-300 text-navy-950 text-xs font-medium space-y-2 max-w-md mx-auto">
-                    <div className="flex items-center justify-center gap-2 text-amber-900 font-black text-sm">
-                      <ShieldAlert className="w-5 h-5 text-amber-600" />
-                      <span>Digital Pass Not Issued Yet</span>
-                    </div>
-                    <p className="text-slate-700 leading-relaxed">
-                      Your family registration is <strong>confirmed</strong>. Official digital QR passes will be generated and issued by Khopoli Relay Centre event admins.
-                    </p>
-                  </div>
-                )}
-              </div>
+                {/* Pass Token Badge & Check-in Status */}
+                <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
+                  <span className="inline-block px-3 py-1 bg-navy-900 text-white rounded-lg text-xs font-mono font-bold tracking-widest uppercase">
+                    Token: {activeMemberPass.pass?.qrToken || `KRC-URS1448H-${activeMemberPass.itsId}`}
+                  </span>
 
-              {/* Status & Security Badge */}
-              <div className="space-y-3 pt-1">
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  {activeMemberPass.pass?.status === "CHECKED_IN" && (
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-bold">
+                  {activeMemberPass.pass?.status === "CHECKED_IN" ? (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-bold">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                       <span>Checked In at Entrance</span>
                     </div>
-                  )}
-
-                  {!activeMemberPass.pass && (
-                    <p className="text-xs text-amber-800 font-bold">
-                      Check back after pass generation is completed by admin.
-                    </p>
+                  ) : (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold">
+                      <CheckCircle2 className="w-4 h-4 text-amber-600" />
+                      <span>Registration Confirmed</span>
+                    </div>
                   )}
                 </div>
+              </div>
 
-                {activeMemberPass.pass && (
-                  <div className="space-y-1">
-                    <p className="text-xs text-slate-600 font-bold flex items-center justify-center gap-1.5">
-                      <ShieldAlert className="w-4 h-4 text-navy-900" />
-                      <span>Protected Live Pass · Present on Phone Screen at Counter</span>
-                    </p>
-                    <p className="text-[10px] text-slate-400 font-medium">
-                      Screenshots & Printing Disabled for Event Security
-                    </p>
+              {/* Venue & Location Details Section */}
+              <div className="p-4 rounded-2xl bg-cream-50 border border-cream-300 text-left space-y-3">
+                <div className="flex items-center gap-2 font-black text-navy-950 text-xs uppercase tracking-wider border-b border-cream-200 pb-2">
+                  <MapPin className="w-4 h-4 text-gold-600 shrink-0" />
+                  <span>Venue & Directions</span>
+                </div>
+
+                <div className="space-y-1 text-xs">
+                  <p className="font-extrabold text-navy-950 text-sm">
+                    {event?.venue || "Maharaja Lawns - Khopoli"}
+                  </p>
+                  <p className="text-slate-600 font-medium leading-relaxed">
+                    {event?.location || "L. M. Sable Nagar, Old Mumbai-Pune Highway, Dist. Khopoli, Maharashtra 410203"}
+                  </p>
+                </div>
+
+                <a
+                  href={event?.mapUrl || "https://maps.google.com/?q=Maharaja+Lawns+Khopoli"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-bold text-xs shadow transition border border-gold-400/40"
+                >
+                  <Navigation className="w-4 h-4" />
+                  <span>Open Location in Google Maps</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+
+              {/* Family Logistics & Event Summary */}
+              <div className="p-4 rounded-2xl bg-navy-950 text-white text-left space-y-3 border border-gold-600/30">
+                <div className="flex items-center gap-2 font-black text-gold-400 text-xs border-b border-white/10 pb-2 uppercase tracking-wider">
+                  <User className="w-4 h-4 text-gold-400 shrink-0" />
+                  <span>Family Registration Details</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-amber-200/70 block text-[10px] uppercase font-bold">Mauze</span>
+                    <span className="font-bold text-white text-sm">{family.mauze}</span>
                   </div>
-                )}
+                  <div>
+                    <span className="text-amber-200/70 block text-[10px] uppercase font-bold">Transportation</span>
+                    <span className="font-bold text-white text-sm flex items-center gap-1">
+                      <Car className="w-3.5 h-3.5 text-gold-400" />
+                      {family.transportMode}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-amber-200/70 block text-[10px] uppercase font-bold">Niyaz Jaman</span>
+                    <span className="font-bold text-white text-xs flex items-center gap-1">
+                      <Utensils className="w-3.5 h-3.5 text-gold-400" />
+                      {family.niyazJaman}
+                    </span>
+                  </div>
+                  {activeMemberPass.isHof && family.niyazContribution && (
+                    <div>
+                      <span className="text-amber-200/70 block text-[10px] uppercase font-bold">Niyaz Contribution</span>
+                      <span className="font-extrabold text-gold-400 text-sm flex items-center gap-1">
+                        <Heart className="w-3.5 h-3.5 text-gold-400" />
+                        {family.niyazContribution === "Je Imkaan Thase" ? family.niyazContribution : `₹${Number(family.niyazContribution).toLocaleString("en-IN")}`}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ) : (

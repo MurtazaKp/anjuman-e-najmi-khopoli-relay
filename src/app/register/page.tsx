@@ -83,11 +83,12 @@ export default function RegisterPage() {
   // Validation & Loading States
   const [itsChecking, setItsChecking] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [modalErrorMsg, setModalErrorMsg] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
   // Real-time backend ITS verification
-  const verifyItsIdBackend = async (itsId: string): Promise<boolean> => {
+  const verifyItsIdBackend = async (itsId: string, setErrorTarget?: (msg: string) => void): Promise<boolean> => {
     try {
       const cleanIts = itsId.trim();
       if (!cleanIts) return true;
@@ -98,7 +99,12 @@ export default function RegisterPage() {
       setItsChecking(false);
 
       if (data.isDuplicate) {
-        setErrorMsg(`This ITS ID (${cleanIts}) is already registered for this event.`);
+        const msg = `This ITS ID (${cleanIts}) is already registered for this event.`;
+        if (setErrorTarget) {
+          setErrorTarget(msg);
+        } else {
+          setErrorMsg(msg);
+        }
         return false;
       }
       return true;
@@ -152,6 +158,7 @@ export default function RegisterPage() {
     setMemberGender("Male");
     setMemberType("Adult");
     setErrorMsg("");
+    setModalErrorMsg("");
     setShowMemberModal(true);
   };
 
@@ -162,28 +169,29 @@ export default function RegisterPage() {
     setMemberGender(member.gender);
     setMemberType(member.type);
     setErrorMsg("");
+    setModalErrorMsg("");
     setShowMemberModal(true);
   };
 
   // Save Member in Family list
   const handleSaveMember = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg("");
+    setModalErrorMsg("");
 
     if (!memberName.trim() || !memberItsId.trim()) {
-      setErrorMsg("Please enter both Name and ITS ID for the family member.");
+      setModalErrorMsg("Please enter both Name and ITS ID for the family member.");
       return;
     }
 
     const cleanIts = memberItsId.trim();
 
     if (cleanIts.length !== 8) {
-      setErrorMsg("Family Member ITS ID must be exactly 8 digits.");
+      setModalErrorMsg("Family Member ITS ID must be exactly 8 digits.");
       return;
     }
 
     if (cleanIts === hofItsId.trim()) {
-      setErrorMsg("This ITS ID matches the HOF's ITS ID.");
+      setModalErrorMsg("This ITS ID matches the HOF's ITS ID.");
       return;
     }
 
@@ -191,11 +199,11 @@ export default function RegisterPage() {
       (m) => m.itsId === cleanIts && m.id !== editingMemberId
     );
     if (isLocalDuplicate) {
-      setErrorMsg(`ITS ID ${cleanIts} is already added in your family list.`);
+      setModalErrorMsg(`ITS ID ${cleanIts} is already added in your family list.`);
       return;
     }
 
-    const isBackendValid = await verifyItsIdBackend(cleanIts);
+    const isBackendValid = await verifyItsIdBackend(cleanIts, setModalErrorMsg);
     if (!isBackendValid) return;
 
     if (editingMemberId) {
@@ -231,8 +239,8 @@ export default function RegisterPage() {
     setSubmitting(true);
     setErrorMsg("");
 
-    const finalMauze = mauze === "Other" ? `Other: ${mauzeOther.trim()}` : mauze;
-    const finalTransport = transportMode === "Other" ? `Other: ${transportOther.trim()}` : transportMode;
+    const finalMauze = mauze === "Other" ? mauzeOther.trim() : mauze;
+    const finalTransport = transportMode === "Other" ? transportOther.trim() : transportMode;
 
     try {
       const res = await fetch("/api/register", {
@@ -781,6 +789,12 @@ export default function RegisterPage() {
             </h3>
 
             <form onSubmit={handleSaveMember} className="space-y-3 text-sm">
+              {modalErrorMsg && (
+                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+                  <span>{modalErrorMsg}</span>
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-bold text-navy-900 mb-1">Member Name *</label>
                 <input

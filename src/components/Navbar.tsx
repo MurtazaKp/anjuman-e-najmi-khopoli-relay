@@ -21,7 +21,6 @@ export default function Navbar() {
   const navLinks = [
     { href: "/", label: "Home", icon: Home },
     { href: "/register", label: "Register Family", icon: Calendar, highlight: true },
-    { href: "/checkin", label: "Staff Check-in", icon: QrCode },
   ];
 
   return (
@@ -68,16 +67,6 @@ export default function Navbar() {
           >
             <Calendar className="w-4 h-4" />
             <span>Register</span>
-          </Link>
-
-          <Link
-            href="/checkin"
-            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
-              pathname === "/checkin" ? "bg-white/20 text-white font-extrabold" : "hover:bg-white/10 text-cream-100"
-            }`}
-          >
-            <QrCode className="w-4 h-4 text-gold-400" />
-            <span>Check-in</span>
           </Link>
         </nav>
 

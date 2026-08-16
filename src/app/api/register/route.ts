@@ -32,6 +32,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No active event found." }, { status: 404 });
     }
 
+    if (event.status !== "REGISTRATION_OPEN") {
+      return NextResponse.json(
+        { error: "Registration for this event is officially closed." },
+        { status: 400 }
+      );
+    }
+
     const family = await registerFamily(event.id, {
       hofName,
       hofItsId,

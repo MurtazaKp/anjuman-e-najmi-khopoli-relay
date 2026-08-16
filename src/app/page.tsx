@@ -63,6 +63,8 @@ export default function EventHomepage() {
         <img
           src="/hero.jpg"
           alt="Anjuman E Najmi Khopoli - Khopoli Relay Centre"
+          loading="eager"
+          decoding="async"
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
 
@@ -100,71 +102,73 @@ export default function EventHomepage() {
         </div>
       </section>
 
-      {/* 2. Main Action Buttons */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* 2. Full-Width Registration Banner */}
+      <section>
         {isRegistrationOpen ? (
           <Link
             href="/register"
-            className="flex items-center justify-between p-5 rounded-2xl bg-gold-600 hover:bg-gold-700 text-white font-black text-lg shadow-lg hover:shadow-xl transition group transform hover:-translate-y-0.5 border border-gold-400/40"
+            className="flex items-center justify-between p-6 rounded-3xl bg-gold-600 hover:bg-gold-700 text-white font-black text-lg shadow-xl hover:shadow-2xl transition group transform hover:-translate-y-0.5 border-2 border-gold-400/60 relative overflow-hidden"
           >
-            <div className="space-y-1">
-              <span className="block text-xs uppercase tracking-wider text-amber-100 font-bold">
-                Event Registration
+            <div className="space-y-1 relative z-10">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 text-white shadow-sm">
+                ✨ Event Registration Open
               </span>
-              <span>Register Family</span>
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight pt-1">
+                Register Your Family Now
+              </h2>
+              <p className="text-xs text-cream-100 font-medium">
+                Submit logistics & niyaz details to obtain official digital event passes
+              </p>
             </div>
-            <ArrowRight className="w-6 h-6 text-white group-hover:translate-x-1 transition-transform" />
+            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+              <ArrowRight className="w-6 h-6 text-white" />
+            </div>
           </Link>
         ) : (
-          <div className="p-5 rounded-2xl bg-cream-100 text-navy-900 font-medium text-sm flex items-center gap-3 border border-cream-300 shadow-sm">
-            <AlertCircle className="w-6 h-6 text-navy-900 shrink-0" />
+          <div className="p-6 rounded-3xl bg-cream-100 text-navy-950 font-medium text-sm flex items-center gap-4 border-2 border-cream-300 shadow-md">
+            <AlertCircle className="w-8 h-8 text-navy-900 shrink-0" />
             <div>
-              <p className="font-extrabold text-navy-900">Registration Closed</p>
-              <p className="text-xs text-navy-900/80 font-medium">
-                Registrations for this event have closed. Digital passes will be issued shortly.
+              <p className="font-extrabold text-navy-900 text-base">Registration Closed</p>
+              <p className="text-xs text-slate-600 font-medium">
+                Registrations for this event have closed. Use the pass lookup below to view your digital pass details.
               </p>
             </div>
           </div>
         )}
-
-        <Link
-          href="/checkin"
-          className="flex items-center justify-between p-5 rounded-2xl bg-navy-900 hover:bg-navy-800 text-white font-black text-base shadow-md hover:shadow-lg transition group border border-navy-800"
-        >
-          <div className="space-y-1">
-            <span className="block text-xs uppercase tracking-wider text-amber-300 font-bold">
-              Venue Entry
-            </span>
-            <span>Staff Check-in Scanner</span>
-          </div>
-          <QrCode className="w-6 h-6 text-gold-400 group-hover:scale-110 transition-transform" />
-        </Link>
       </section>
 
-      {/* 3. Pass Lookup Form */}
-      <section className="bg-white rounded-2xl p-5 border-1.5 border-cream-300 premium-card space-y-3">
-        <div className="flex items-center gap-2 font-black text-navy-900 text-base">
-          <Search className="w-5 h-5 text-gold-600" />
-          <span>Already Registered? Find Your Passes</span>
+      {/* 3. Pass Lookup Hub */}
+      <section className="bg-white rounded-3xl p-6 border-2 border-cream-300 card-shadow space-y-4">
+        <div className="flex items-center justify-between border-b border-cream-200 pb-3">
+          <div className="flex items-center gap-2 font-black text-navy-950 text-base">
+            <Search className="w-5 h-5 text-gold-600" />
+            <span>Find Your Family Passes</span>
+          </div>
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            Instant Lookup
+          </span>
         </div>
-        <p className="text-xs text-slate-600 font-medium">
-          Enter your HOF ITS ID or Pass Link Token to view your family's digital QR passes.
+
+        <p className="text-xs text-slate-600 font-medium leading-relaxed">
+          Enter your <strong>8-digit ITS ID</strong>, <strong>Mobile Number</strong>, or <strong>Pass Token</strong> to view your family's digital event passes.
         </p>
 
-        <form onSubmit={handlePassLookup} className="flex gap-2">
+        <form onSubmit={handlePassLookup} className="flex flex-col sm:flex-row gap-2.5">
           <input
             type="text"
-            placeholder="Enter HOF ITS ID or Pass Token..."
+            placeholder="Enter ITS ID, Mobile Number, or Pass Token..."
             value={searchToken}
             onChange={(e) => setSearchToken(e.target.value)}
-            className="flex-1 px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white text-sm"
+            className="flex-1 px-4 py-3 rounded-xl border-2 border-navy-900 focus:ring-2 focus:ring-gold-500 focus:outline-none font-bold text-navy-950 bg-cream-50 text-sm"
+            required
           />
           <button
             type="submit"
             disabled={searching}
-            className="px-5 py-2.5 rounded-xl bg-navy-900 hover:bg-navy-800 text-white font-bold text-xs shadow-md transition"
+            className="px-6 py-3 rounded-xl bg-navy-900 hover:bg-navy-950 text-white font-black text-sm shadow-md transition flex items-center justify-center gap-2 border border-gold-500/40 shrink-0"
           >
-            {searching ? "Searching..." : "Lookup Passes"}
+            <Search className="w-4 h-4 text-gold-400" />
+            <span>{searching ? "Searching..." : "Lookup Passes"}</span>
           </button>
         </form>
       </section>
@@ -209,23 +213,58 @@ export default function EventHomepage() {
             <span>General Instructions</span>
           </div>
           <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-gold-600 text-white rounded-full">
-            Notice
+            Important Notice
           </span>
         </div>
 
-        <div className="space-y-4 text-xs sm:text-sm text-navy-950">
-          <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 font-bold text-amber-900 leading-relaxed flex items-start gap-2">
-            <span className="text-base shrink-0">📌</span>
-            <span>Note: Please submit only one response per family or group to ensure accurate results.</span>
-          </div>
-
-          <div className="pt-2 border-t border-cream-200 flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-navy-950">
-            <div className="flex items-center gap-1.5">
-              <PhoneCall className="w-4 h-4 text-gold-600 shrink-0" />
-              <span>For Online Assistance: <strong>+91 98235 63647</strong></span>
+        <ul className="space-y-3 text-xs sm:text-sm text-navy-950">
+          <li className="p-3.5 rounded-xl bg-navy-950 text-white font-bold leading-relaxed flex items-start gap-2.5 shadow-md border border-gold-500/40">
+            <span className="text-base shrink-0">📱</span>
+            <div>
+              <span className="font-extrabold text-gold-400 text-sm block">Digital Entry Pass:</span>
+              <span className="text-xs text-cream-100 font-semibold">
+                Mumineen must <strong>show their digital pass screen on their mobile phone at the entrance counter to gain entry</strong> to the venue.
+              </span>
             </div>
-            <span className="text-slate-600 font-bold">(Huzefa bhai - Jamaat Member)</span>
+          </li>
+
+          <li className="p-3.5 rounded-xl bg-gold-600 text-white font-bold leading-relaxed flex items-start gap-2.5 shadow-md border border-gold-400">
+            <span className="text-base shrink-0">💳</span>
+            <div>
+              <span className="font-extrabold text-white text-sm block">Bring Physical ITS Card:</span>
+              <span className="text-xs text-cream-100 font-semibold">
+                Kindly <strong>bring your physical ITS card for scanning and verification</strong> at the entrance counter.
+              </span>
+            </div>
+          </li>
+
+          <li className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 font-bold text-amber-950 leading-relaxed flex items-start gap-2.5 shadow-sm">
+            <span className="text-base shrink-0">🪑</span>
+            <div>
+              <span className="font-extrabold text-navy-950 text-sm block">Bring Your Own Chair:</span>
+              <span className="text-xs text-amber-900 font-bold">
+                Kindly bring your own chair if required. Chairs will <strong>NOT be provided under any circumstances</strong> at the venue.
+              </span>
+            </div>
+          </li>
+
+          <li className="p-3.5 rounded-xl bg-cream-100 border border-cream-300 font-bold text-navy-950 leading-relaxed flex items-start gap-2.5">
+            <span className="text-base shrink-0">📌</span>
+            <div>
+              <span className="font-extrabold text-navy-950 text-sm block">Single Family Registration:</span>
+              <span className="text-xs text-slate-700 font-medium">
+                Please submit only one registration form response per family or group to ensure accurate arrangements.
+              </span>
+            </div>
+          </li>
+        </ul>
+
+        <div className="pt-3 border-t border-cream-200 flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-navy-950">
+          <div className="flex items-center gap-1.5">
+            <PhoneCall className="w-4 h-4 text-gold-600 shrink-0" />
+            <span>For Online Assistance: <strong>+91 98235 63647</strong></span>
           </div>
+          <span className="text-slate-600 font-bold">(Huzefa bhai - Jamaat Member)</span>
         </div>
       </section>
     </div>
