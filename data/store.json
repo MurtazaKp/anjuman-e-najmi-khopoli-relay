@@ -10,14 +10,54 @@
       "venue": "Maharaja Lawns - Khopoli",
       "location": "L. M. Sable Nagar, Old Mumbai-Pune Highway, Dist. Khopoli, Maharashtra 410203",
       "mapUrl": "https://maps.google.com/?q=Maharaja+Lawns+Khopoli",
+      "parkingMapUrl": "https://www.google.com/maps/place/18%C2%B047'39.0%22N+73%C2%B020'09.9%22E/@18.7941691,73.3335153,17z/data=!3m1!4b1!4m4!3m3!8m2!3d18.7941691!4d73.3360902!18m1!1e1?entry=ttu&g_ep=EgoyMDI2MDgxMi4wIKXMDSoASAFQAw%3D%3D",
       "latitude": 18.7905,
       "longitude": 73.3444,
       "registrationStart": "2026-08-14T20:00:00.000Z",
       "registrationEnd": "2026-09-14T20:00:00.000Z",
-      "status": "REGISTRATION_OPEN",
-      "isCurrent": true
+      "status": "PASSES_ISSUED",
+      "isCurrent": true,
+      "passIssueDate": "2026-08-17T14:02:00.134Z"
     }
   ],
-  "families": [],
-  "passes": []
+  "families": [
+    {
+      "id": "fam-1786975124459-992",
+      "eventId": "event-urs-1448h",
+      "hofName": "Murtaza Khopoliwala",
+      "hofItsId": "50499558",
+      "mobileNumber": "9403825153",
+      "mauze": "Lonavala",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "Yes, Jami ne Jaisu",
+      "niyazContribution": "7200",
+      "passLinkToken": "pass-1786975124459-tvshsp",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-08-17T13:58:44.460Z",
+      "members": [
+        {
+          "id": "mem-fam-1786975124459-992-1",
+          "familyId": "fam-1786975124459-992",
+          "eventId": "event-urs-1448h",
+          "itsId": "50499558",
+          "name": "Murtaza Khopoliwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-08-17T13:58:44.459Z"
+        }
+      ]
+    }
+  ],
+  "passes": [
+    {
+      "id": "pass-mem-fam-1786975124459-992-1",
+      "eventId": "event-urs-1448h",
+      "memberId": "mem-fam-1786975124459-992-1",
+      "qrToken": "KRC-URS-1448H-50499558",
+      "status": "ISSUED",
+      "createdAt": "2026-08-17T14:02:00.134Z"
+    }
+  ]
 }

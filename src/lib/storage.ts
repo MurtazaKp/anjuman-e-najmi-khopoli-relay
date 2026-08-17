@@ -437,10 +437,27 @@ export function getFamilyPassesData(tokenOrIts: string) {
 
   const event = store.events.find((e) => e.id === family.eventId);
 
+  // Compute global sequential pass number for every member in store
+  const allMembersOrdered: FamilyMemberData[] = [];
+  for (const f of store.families) {
+    if (f.eventId === family.eventId) {
+      for (const m of f.members) {
+        allMembersOrdered.push(m);
+      }
+    }
+  }
+
+  const passNumberMap = new Map<string, number>();
+  allMembersOrdered.forEach((m, idx) => {
+    passNumberMap.set(m.id, idx + 1);
+  });
+
   const membersWithPasses = family.members.map((m) => {
     const pass = store.passes.find((p) => p.memberId === m.id);
+    const passNumber = passNumberMap.get(m.id) || 1;
     return {
       ...m,
+      passNumber,
       pass: pass || null,
     };
   });

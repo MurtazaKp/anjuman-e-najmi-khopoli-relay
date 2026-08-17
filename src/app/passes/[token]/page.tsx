@@ -18,6 +18,7 @@ import {
   User,
   Navigation
 } from "lucide-react";
+import ScreenshotGuard from "@/components/ScreenshotGuard";
 
 export default function PassesPage() {
   const params = useParams();
@@ -27,7 +28,6 @@ export default function PassesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeMemberPass, setActiveMemberPass] = useState<any>(null);
-  const [capturingBlocked, setCapturingBlocked] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -53,30 +53,6 @@ export default function PassesPage() {
         setError("Failed to fetch passes. Please check your network.");
       });
   }, [token]);
-
-  // Mobile Screenshot & App Switcher Anti-Capture Listeners
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        setCapturingBlocked(true);
-      } else {
-        setTimeout(() => setCapturingBlocked(false), 600);
-      }
-    };
-
-    const handleBlur = () => {
-      setCapturingBlocked(true);
-      setTimeout(() => setCapturingBlocked(false), 600);
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("blur", handleBlur);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("blur", handleBlur);
-    };
-  }, []);
 
   if (loading) {
     return (
@@ -118,6 +94,7 @@ export default function PassesPage() {
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
+      <ScreenshotGuard />
       {/* Header Banner */}
       <div className="bg-white rounded-2xl p-5 border border-cream-300 premium-card flex flex-wrap items-center justify-between gap-3">
         <div>
@@ -155,7 +132,7 @@ export default function PassesPage() {
         </div>
       </div>
 
-      {/* Conditional Rendering: Pending Confirmation vs Full Issued Passes */}
+      {/* Conditional Rendering: Pending Registration Confirmation vs Full Issued Passes */}
       {!passesGenerated ? (
         <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-gold-600 shadow-xl text-center space-y-6 w-full">
           <div className="w-16 h-16 bg-cream-100 text-gold-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm border border-gold-400">
@@ -201,7 +178,7 @@ export default function PassesPage() {
           </div>
         </div>
       ) : (
-        /* Family Members Pass Cards List & Full Venue Details (When Passes Issued) */
+        /* Family Members Pass Cards List (When Passes Issued) */
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Left Column: Member Selector List */}
           <div className="md:col-span-1 space-y-2 no-print">
@@ -247,139 +224,83 @@ export default function PassesPage() {
             })}
           </div>
 
-          {/* Right Column: Active Pass Details & Venue Cards */}
+          {/* Right Column: Active Member Relay Pass Card (UNIFIED LIGHT BLUE + BLACK TEXT & BORDER) */}
           <div className="md:col-span-2">
             {activeMemberPass ? (
               <div
-                onContextMenu={(e) => e.preventDefault()}
-                style={{ WebkitTouchCallout: "none" }}
-                className="printable-pass-card bg-white rounded-3xl p-6 border-2 border-navy-900 shadow-xl space-y-5 text-center relative overflow-hidden select-none"
+                className="printable-pass-card bg-sky-50 rounded-xl p-6 border-2 border-black shadow-xl space-y-4 text-center relative overflow-hidden select-none text-black"
               >
-                {/* Event Header */}
-                <div className="navy-header -mx-6 -mt-6 p-4 text-white space-y-1 border-b-2 border-gold-600 text-left">
-                  <p className="text-[10px] font-black tracking-widest uppercase text-gold-400">
-                    Anjuman E Najmi Khopoli
-                  </p>
-                  <h3 className="text-base font-black text-left">
+                {/* Event Header Info */}
+                <div className="border-b-2 border-black pb-3 space-y-1 text-left">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-black tracking-widest uppercase text-black">
+                      ANJUMAN E NAJMI KHOPOLI
+                    </p>
+                    <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-black text-white border border-black tracking-wider">
+                      RELAY PASS
+                    </span>
+                  </div>
+                  <h3 className="text-base font-black text-black text-left pt-0.5">
                     {event?.name || "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H"}
                   </h3>
-                  <div className="flex flex-wrap items-center justify-start gap-3 text-xs text-cream-100 pt-1 font-semibold text-left">
+                  <div className="flex flex-wrap items-center justify-start gap-3 text-xs text-black font-bold pt-1 text-left">
                     <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-gold-400" />
+                      <Calendar className="w-3.5 h-3.5 text-black" />
                       {event?.date || "16th Rabi al-Awwal 1448H"}
                     </span>
                     <span>·</span>
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-gold-400" />
+                      <MapPin className="w-3.5 h-3.5 text-black" />
                       {event?.venue || "Maharaja Lawns - Khopoli"}
                     </span>
                   </div>
                 </div>
 
-                {/* Member Pass Details Header */}
-                <div className="space-y-1 pt-2">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cream-100 border border-cream-300 text-xs font-bold text-navy-900 mb-2">
-                    <span>ITS ID: {activeMemberPass.itsId}</span>
-                    <span>·</span>
-                    <span>{activeMemberPass.gender}</span>
-                    <span>·</span>
-                    <span>{activeMemberPass.type}</span>
+                {/* Member Pass Identity Info */}
+                <div className="space-y-3 pt-1">
+                  <div>
+                    <div className="inline-flex flex-wrap items-center justify-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black text-xs font-black text-black shadow-sm">
+                      <span>ITS ID: {activeMemberPass.itsId}</span>
+                      <span>·</span>
+                      <span>{activeMemberPass.gender}</span>
+                      <span>·</span>
+                      <span>{activeMemberPass.type}</span>
+                    </div>
                   </div>
-                  <h2 className="text-2xl font-black text-navy-950 tracking-tight">
+
+                  <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight">
                     {activeMemberPass.name}
                   </h2>
-                  <p className="text-xs text-slate-600 font-medium">
+
+                  <p className="text-xs text-black font-extrabold">
                     {activeMemberPass.isHof ? "Head of Family (HOF)" : `Family Member of ${family.hofName}`}
                   </p>
 
-                  {/* Pass Token Badge & Check-in Status */}
+                  {/* Pass Token Badge */}
                   <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
-                    <span className="inline-block px-3 py-1 bg-navy-900 text-white rounded-lg text-xs font-mono font-bold tracking-widest uppercase">
-                      Token: {activeMemberPass.pass?.qrToken || `KRC-URS1448H-${activeMemberPass.itsId}`}
+                    <span className="inline-block px-3.5 py-1.5 bg-black text-white rounded-lg text-xs font-mono font-black tracking-widest uppercase shadow">
+                      TOKEN: {activeMemberPass.pass?.qrToken || `KRC-URS1448H-${activeMemberPass.itsId}`}-{String(activeMemberPass.passNumber || 1).padStart(2, "0")}
                     </span>
-
-                    {activeMemberPass.pass?.status === "CHECKED_IN" ? (
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-bold">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                        <span>Checked In at Entrance</span>
-                      </div>
-                    ) : (
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold">
-                        <CheckCircle2 className="w-4 h-4 text-amber-600" />
-                        <span>Pass Issued</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Venue & Location Details Section */}
-                <div className="p-4 rounded-2xl bg-cream-50 border border-cream-300 text-left space-y-3">
-                  <div className="flex items-center gap-2 font-black text-navy-950 text-xs uppercase tracking-wider border-b border-cream-200 pb-2">
-                    <MapPin className="w-4 h-4 text-gold-600 shrink-0" />
-                    <span>Venue & Directions</span>
                   </div>
 
-                  <div className="space-y-1 text-xs">
-                    <p className="font-extrabold text-navy-950 text-sm">
-                      {event?.venue || "Maharaja Lawns - Khopoli"}
+                  {/* Important Instructions Section */}
+                  <div className="border-t-2 border-black/20 pt-3 text-left space-y-2">
+                    <p className="text-xs font-black uppercase text-black tracking-wider">
+                      📋 Important Instructions:
                     </p>
-                    <p className="text-slate-600 font-medium leading-relaxed">
-                      {event?.location || "L. M. Sable Nagar, Old Mumbai-Pune Highway, Dist. Khopoli, Maharashtra 410203"}
-                    </p>
-                  </div>
-
-                  <a
-                    href={event?.mapUrl || "https://maps.google.com/?q=Maharaja+Lawns+Khopoli"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-bold text-xs shadow transition border border-gold-400/40"
-                  >
-                    <Navigation className="w-4 h-4" />
-                    <span>Open Location in Google Maps</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-
-                {/* Family Logistics & Event Summary */}
-                <div className="p-4 rounded-2xl bg-navy-950 text-white text-left space-y-3 border border-gold-600/30">
-                  <div className="flex items-center gap-2 font-black text-gold-400 text-xs border-b border-white/10 pb-2 uppercase tracking-wider">
-                    <User className="w-4 h-4 text-gold-400 shrink-0" />
-                    <span>Family Registration Details</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <span className="text-amber-200/70 block text-[10px] uppercase font-bold">Mauze</span>
-                      <span className="font-bold text-white text-sm">{family.mauze}</span>
-                    </div>
-                    <div>
-                      <span className="text-amber-200/70 block text-[10px] uppercase font-bold">Transportation</span>
-                      <span className="font-bold text-white text-sm flex items-center gap-1">
-                        <Car className="w-3.5 h-3.5 text-gold-400" />
-                        {family.transportMode}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-amber-200/70 block text-[10px] uppercase font-bold">Niyaz Jaman</span>
-                      <span className="font-bold text-white text-xs flex items-center gap-1">
-                        <Utensils className="w-3.5 h-3.5 text-gold-400" />
-                        {family.niyazJaman}
-                      </span>
-                    </div>
-                    {activeMemberPass.isHof && family.niyazContribution && (
-                      <div>
-                        <span className="text-amber-200/70 block text-[10px] uppercase font-bold">Niyaz Contribution</span>
-                        <span className="font-extrabold text-gold-400 text-sm flex items-center gap-1">
-                          <Heart className="w-3.5 h-3.5 text-gold-400" />
-                          {family.niyazContribution === "Je Imkaan Thase" ? family.niyazContribution : `₹${Number(family.niyazContribution).toLocaleString("en-IN")}`}
-                        </span>
-                      </div>
-                    )}
+                    <ul className="text-[11px] font-bold text-black space-y-1 pl-4 list-disc leading-relaxed">
+                      <li>ITS Card number will be matched and verified with this pass at entry.</li>
+                      <li>Please bring your physical ITS Card along with this digital pass.</li>
+                      <li>Venue gates will open at 9:00 AM.</li>
+                      <li><strong>Parking Note:</strong> Park your car at designated parking space and a Khidmatguzar will guide you in parking.</li>
+                      <li>Bring your own chair if required for sitting.</li>
+                      <li>Bring an umbrella in case of rainy weather.</li>
+                    </ul>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="p-8 text-center text-slate-400 border border-dashed rounded-2xl bg-white">
+              <div className="p-8 text-center text-slate-400 border border-dashed rounded-xl bg-white">
                 Select a family member to view details.
               </div>
             )}

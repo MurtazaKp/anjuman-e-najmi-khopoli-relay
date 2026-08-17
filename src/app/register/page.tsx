@@ -327,6 +327,17 @@ export default function RegisterPage() {
         <p className="text-xs text-slate-700 leading-relaxed font-medium">
           Registrations for <strong>{event?.name || "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H"}</strong> have officially closed. Digital passes will be issued shortly.
         </p>
+
+        {/* Capacity Full Nearest Relay Centre Notice */}
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-left space-y-1 text-xs text-amber-950 shadow-sm">
+          <p className="font-extrabold leading-relaxed text-amber-950">
+            Those who couldn't register are requested to go to other nearest Relay Centre as we are now full.
+          </p>
+          <p className="text-slate-600 font-semibold text-[11px] pt-1">
+            Thank you for your cooperation & sorry for the inconvenience caused.
+          </p>
+        </div>
+
         <div className="pt-2">
           <Link
             href="/"
