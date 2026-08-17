@@ -58,7 +58,7 @@ export default function EventHomepage() {
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
       {/* 1. Premium Hero Banner Section with Custom Uploaded Image */}
-      <section className="relative overflow-hidden rounded-3xl text-white shadow-2xl border-2 border-gold-600 min-h-[340px] flex flex-col justify-end p-6 sm:p-8">
+      <section className="relative overflow-hidden rounded-3xl text-white shadow-2xl border-2 border-gold-600 min-h-[300px] sm:min-h-[340px] flex flex-col justify-end p-4 sm:p-8">
         {/* Background Image */}
         <img
           src="/hero.jpg"
@@ -72,29 +72,29 @@ export default function EventHomepage() {
         <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/75 to-navy-900/35 pointer-events-none"></div>
 
         {/* Hero Content */}
-        <div className="relative z-10 space-y-3.5">
+        <div className="relative z-10 space-y-3">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black bg-gold-600 text-white shadow border border-gold-400">
-              <img src="/logo.jpg" className="w-4 h-4 rounded-full object-cover" alt="" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-xs font-black bg-gold-600 text-white shadow border border-gold-400">
+              <img src="/logo.jpg" className="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full object-cover" alt="" />
               <span>Anjuman E Najmi Khopoli</span>
             </span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight text-white drop-shadow-md">
+          <h1 className="text-xl sm:text-3xl font-black tracking-tight leading-tight text-white drop-shadow-md">
             {event?.name || "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H"}
           </h1>
 
-          <p className="text-cream-100 text-xs sm:text-sm leading-relaxed max-w-2xl font-medium drop-shadow">
+          <p className="text-cream-100 text-[11px] sm:text-sm leading-relaxed max-w-2xl font-medium drop-shadow">
             {event?.description}
           </p>
 
           {/* Quick Info Pills */}
-          <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-amber-200 font-bold">
-            <div className="flex items-center gap-2 bg-navy-950/80 px-3.5 py-2.5 rounded-xl backdrop-blur-md border border-gold-600/50 shadow">
+          <div className="pt-1.5 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] sm:text-xs text-amber-200 font-bold">
+            <div className="flex items-center gap-2 bg-navy-950/80 px-3 py-2 rounded-xl backdrop-blur-md border border-gold-600/50 shadow">
               <Calendar className="w-4 h-4 text-gold-400 shrink-0" />
               <span>{event?.date || "16th Rabi al-Awwal 1448H"}</span>
             </div>
-            <div className="flex items-center gap-2 bg-navy-950/80 px-3.5 py-2.5 rounded-xl backdrop-blur-md border border-gold-600/50 shadow">
+            <div className="flex items-center gap-2 bg-navy-950/80 px-3 py-2 rounded-xl backdrop-blur-md border border-gold-600/50 shadow">
               <Clock className="w-4 h-4 text-gold-400 shrink-0" />
               <span>{event?.time || "9:00 AM Onwards"}</span>
             </div>
@@ -107,44 +107,44 @@ export default function EventHomepage() {
         {isRegistrationOpen ? (
           <Link
             href="/register"
-            className="flex items-center justify-between p-6 rounded-3xl bg-gold-600 hover:bg-gold-700 text-white font-black text-lg shadow-xl hover:shadow-2xl transition group transform hover:-translate-y-0.5 border-2 border-gold-400/60 relative overflow-hidden"
+            className="flex items-center justify-between p-4 sm:p-6 rounded-3xl bg-gold-600 hover:bg-gold-700 text-white font-black text-base sm:text-lg shadow-xl hover:shadow-2xl transition group transform hover:-translate-y-0.5 border-2 border-gold-400/60 relative overflow-hidden"
           >
-            <div className="space-y-1 relative z-10">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 text-white shadow-sm">
+            <div className="space-y-1 relative z-10 pr-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-white/20 text-white shadow-sm">
                 ✨ Event Registration Open
               </span>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight pt-1">
+              <h2 className="text-lg sm:text-2xl font-black text-white tracking-tight pt-0.5">
                 Register Your Family Now
               </h2>
-              <p className="text-xs text-cream-100 font-medium">
+              <p className="text-[11px] sm:text-xs text-cream-100 font-medium">
                 Submit logistics & niyaz details to obtain official digital event passes
               </p>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-              <ArrowRight className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
           </Link>
         ) : (
-          <div className="p-6 sm:p-7 rounded-3xl bg-amber-50 text-navy-950 font-medium text-sm border-2 border-amber-400 shadow-lg space-y-3">
+          <div className="p-4 sm:p-7 rounded-3xl bg-amber-50 text-navy-950 font-medium text-sm border-2 border-amber-400 shadow-lg space-y-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md">
-                <AlertCircle className="w-6 h-6 text-white" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md">
+                <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <span className="inline-block px-3 py-0.5 rounded-full bg-amber-200 text-amber-950 text-[10px] font-black uppercase tracking-wider border border-amber-300">
+                <span className="inline-block px-2.5 py-0.5 rounded-full bg-amber-200 text-amber-950 text-[9px] sm:text-[10px] font-black uppercase tracking-wider border border-amber-300">
                   ⛔ Capacity Reached · Registration Closed
                 </span>
-                <h2 className="text-lg sm:text-xl font-black text-navy-950 pt-0.5">
+                <h2 className="text-base sm:text-xl font-black text-navy-950 pt-0.5">
                   Event Registration Full
                 </h2>
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white border border-amber-200 text-xs sm:text-sm text-navy-950 font-bold leading-relaxed space-y-1 shadow-sm">
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-amber-200 text-xs sm:text-sm text-navy-950 font-bold leading-relaxed space-y-1 shadow-sm">
               <p className="text-slate-800 font-extrabold leading-relaxed">
                 Those who couldn't register are requested to go to other nearest Relay Centre as we are now full.
               </p>
-              <p className="text-slate-600 font-semibold text-xs pt-1">
+              <p className="text-slate-600 font-semibold text-[11px] sm:text-xs pt-1">
                 Thank you for your cooperation & sorry for the inconvenience caused.
               </p>
             </div>
@@ -153,13 +153,13 @@ export default function EventHomepage() {
       </section>
 
       {/* 3. Pass Lookup Hub */}
-      <section className="bg-white rounded-3xl p-6 border-2 border-cream-300 card-shadow space-y-4">
+      <section className="bg-white rounded-3xl p-4 sm:p-6 border-2 border-cream-300 card-shadow space-y-4">
         <div className="flex items-center justify-between border-b border-cream-200 pb-3">
-          <div className="flex items-center gap-2 font-black text-navy-950 text-base">
-            <Search className="w-5 h-5 text-gold-600" />
+          <div className="flex items-center gap-2 font-black text-navy-950 text-sm sm:text-base">
+            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gold-600" />
             <span>Find Your Family Passes</span>
           </div>
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+          <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider">
             Instant Lookup
           </span>
         </div>
@@ -174,13 +174,13 @@ export default function EventHomepage() {
             placeholder="Enter ITS ID, Mobile Number, or Pass Token..."
             value={searchToken}
             onChange={(e) => setSearchToken(e.target.value)}
-            className="flex-1 px-4 py-3 rounded-xl border-2 border-navy-900 focus:ring-2 focus:ring-gold-500 focus:outline-none font-bold text-navy-950 bg-cream-50 text-sm"
+            className="flex-1 px-4 py-3 rounded-xl border-2 border-navy-900 focus:ring-2 focus:ring-gold-500 focus:outline-none font-bold text-navy-950 bg-cream-50 text-xs sm:text-sm"
             required
           />
           <button
             type="submit"
             disabled={searching}
-            className="px-6 py-3 rounded-xl bg-navy-900 hover:bg-navy-950 text-white font-black text-sm shadow-md transition flex items-center justify-center gap-2 border border-gold-500/40 shrink-0"
+            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-navy-900 hover:bg-navy-950 text-white font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 border border-gold-500/40 shrink-0"
           >
             <Search className="w-4 h-4 text-gold-400" />
             <span>{searching ? "Searching..." : "Lookup Passes"}</span>
@@ -189,29 +189,29 @@ export default function EventHomepage() {
       </section>
 
       {/* 4. Venue & Event Location Details */}
-      <section className="bg-white rounded-2xl p-6 border border-cream-300 premium-card space-y-4">
-        <div className="flex items-center gap-2 font-black text-navy-950 text-base border-b border-cream-200 pb-3">
-          <MapPin className="w-5 h-5 text-gold-600" />
+      <section className="bg-white rounded-2xl p-4 sm:p-6 border border-cream-300 premium-card space-y-4">
+        <div className="flex items-center gap-2 font-black text-navy-950 text-sm sm:text-base border-b border-cream-200 pb-3">
+          <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-gold-600" />
           <span>Venue & Parking Directions</span>
         </div>
 
-        <div className="space-y-2 text-xs">
-          <p className="text-sm font-black text-navy-950">
+        <div className="space-y-1.5 text-xs">
+          <p className="text-xs sm:text-sm font-black text-navy-950">
             {event?.venue || "Maharaja Lawns - Khopoli"}
           </p>
-          <p className="text-slate-600 leading-relaxed font-medium">
+          <p className="text-slate-600 leading-relaxed font-medium text-[11px] sm:text-xs">
             {event?.location || "L. M. Sable Nagar, Old Mumbai-Pune Highway, Dist. Khopoli, Maharashtra 410203"}
           </p>
         </div>
 
-        <div className="pt-2 flex flex-wrap items-center gap-2.5">
+        <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
           <a
             href={event?.mapUrl || "https://maps.google.com/?q=Maharaja+Lawns+Khopoli"}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cream-100 hover:bg-cream-200 text-navy-950 font-bold text-xs border border-gold-500/40 shadow-sm transition"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-cream-100 hover:bg-cream-200 text-navy-950 font-bold text-xs border border-gold-500/40 shadow-sm transition"
           >
-            <MapPin className="w-4 h-4 text-gold-600" />
+            <MapPin className="w-4 h-4 text-gold-600 shrink-0" />
             <span>Open Venue Location on Google Maps &rarr;</span>
           </a>
 
@@ -219,7 +219,7 @@ export default function EventHomepage() {
             href={event?.parkingMapUrl || "https://www.google.com/maps/place/18%C2%B047'39.0%22N+73%C2%B020'09.9%22E/@18.7941691,73.3335153,17z/data=!3m1!4b1!4m4!3m3!8m2!3d18.7941691!4d73.3360902!18m1!1e1?entry=ttu&g_ep=EgoyMDI2MDgxMi4wIKXMDSoASAFQAw%3D%3D"}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-navy-900 hover:bg-navy-950 text-white font-bold text-xs border border-gold-500/40 shadow-md transition"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-navy-900 hover:bg-navy-950 text-white font-bold text-xs border border-gold-500/40 shadow-md transition"
           >
             <span>🚘 Open Parking Location in Maps ↗</span>
           </a>
@@ -230,13 +230,13 @@ export default function EventHomepage() {
       <DigitalQrCard size="large" />
 
       {/* 6. General Instructions Section */}
-      <section className="bg-white rounded-2xl p-6 border-2 border-gold-500/60 premium-card space-y-4 shadow-md">
-        <div className="flex items-center justify-between border-b border-cream-200 pb-3">
-          <div className="flex items-center gap-2 font-black text-navy-950 text-base">
-            <Info className="w-5 h-5 text-gold-600" />
-            <span>General Instructions</span>
+      <section className="bg-white rounded-2xl p-4 sm:p-6 border-2 border-gold-500/60 premium-card space-y-4 shadow-md">
+        <div className="flex items-center justify-between gap-2 border-b border-cream-200 pb-3">
+          <div className="flex items-center gap-1.5 font-black text-navy-950 text-sm sm:text-base shrink-0">
+            <Info className="w-4 h-4 sm:w-5 sm:h-5 text-gold-600 shrink-0" />
+            <span className="whitespace-nowrap">General Instructions</span>
           </div>
-          <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-gold-600 text-white rounded-full">
+          <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 sm:px-2.5 py-0.5 sm:py-1 bg-gold-600 text-white rounded-full shrink-0 whitespace-nowrap">
             Important Notice
           </span>
         </div>

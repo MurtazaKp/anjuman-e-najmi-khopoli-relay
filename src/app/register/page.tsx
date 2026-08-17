@@ -314,7 +314,7 @@ export default function RegisterPage() {
   // Registration Closed Guard
   if (event?.status && event.status !== "REGISTRATION_OPEN") {
     return (
-      <div className="bg-white rounded-3xl p-8 border-2 border-navy-950 premium-card text-center max-w-md mx-auto space-y-5 my-8 shadow-2xl animate-fade-in">
+      <div className="bg-white rounded-3xl p-5 sm:p-8 border-2 border-navy-950 premium-card text-center max-w-md mx-auto space-y-5 my-6 sm:my-8 shadow-2xl animate-fade-in">
         <div className="w-16 h-16 bg-navy-950 text-gold-400 rounded-2xl flex items-center justify-center mx-auto shadow-md border border-gold-600">
           <Lock className="w-8 h-8" />
         </div>

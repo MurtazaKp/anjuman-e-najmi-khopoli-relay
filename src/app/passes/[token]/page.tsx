@@ -96,36 +96,36 @@ export default function PassesPage() {
     <div className="space-y-6 max-w-3xl mx-auto">
       <ScreenshotGuard />
       {/* Header Banner */}
-      <div className="bg-white rounded-2xl p-5 border border-cream-300 premium-card flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-black text-gold-600 uppercase tracking-wide">
+      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-cream-300 premium-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] sm:text-xs font-black text-gold-600 uppercase tracking-wide">
               Family Event Record
             </span>
             {!passesGenerated && (
-              <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[10px] font-black border border-amber-300 flex items-center gap-1">
-                <Clock className="w-3 h-3 text-amber-700" />
-                Passes Pending Admin Issuance
+              <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 text-[9px] sm:text-[10px] font-black border border-amber-300 flex items-center gap-1">
+                <Clock className="w-3 h-3 text-amber-700 shrink-0" />
+                <span>Passes Pending Issuance</span>
               </span>
             )}
           </div>
-          <h1 className="text-xl font-black text-navy-950 mt-0.5">
+          <h1 className="text-lg sm:text-xl font-black text-navy-950 tracking-tight">
             {family.hofName}'s Family
           </h1>
-          <p className="text-xs text-slate-600 font-medium">
+          <p className="text-[11px] sm:text-xs text-slate-600 font-medium">
             Registered Mobile: <strong>{family.mobileNumber}</strong> · Members: <strong>{family.members.length}</strong>
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="self-start sm:self-center">
           {passesGenerated ? (
-            <div className="px-3 py-1 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-bold flex items-center gap-1">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <div className="px-3 py-1 rounded-lg bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-bold flex items-center gap-1 shadow-sm">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <span>Passes Issued</span>
             </div>
           ) : (
-            <div className="px-3 py-1 rounded-lg bg-cream-200 border border-gold-400 text-navy-900 text-xs font-bold flex items-center gap-1">
-              <Clock className="w-4 h-4 text-gold-600" />
+            <div className="px-3 py-1 rounded-lg bg-cream-200 border border-gold-400 text-navy-900 text-xs font-bold flex items-center gap-1 shadow-sm">
+              <Clock className="w-3.5 h-3.5 text-gold-600 shrink-0" />
               <span>Registration Confirmed</span>
             </div>
           )}
@@ -134,16 +134,16 @@ export default function PassesPage() {
 
       {/* Conditional Rendering: Pending Registration Confirmation vs Full Issued Passes */}
       {!passesGenerated ? (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-gold-600 shadow-xl text-center space-y-6 w-full">
-          <div className="w-16 h-16 bg-cream-100 text-gold-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm border border-gold-400">
-            <Clock className="w-8 h-8 text-gold-600" />
+        <div className="bg-white rounded-3xl p-4 sm:p-8 border-2 border-gold-600 shadow-xl text-center space-y-5 sm:space-y-6 w-full">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-cream-100 text-gold-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm border border-gold-400">
+            <Clock className="w-7 h-7 sm:w-8 sm:h-8 text-gold-600" />
           </div>
 
-          <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
+          <div className="space-y-1.5">
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 sm:px-3.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
               🟡 Registration Confirmed
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-navy-950 pt-1">
+            <h2 className="text-xl sm:text-3xl font-black text-navy-950 pt-1 leading-snug">
               Digital Passes Will Be Issued Shortly
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-lg mx-auto">
@@ -152,24 +152,24 @@ export default function PassesPage() {
           </div>
 
           {/* Registered Family Members Summary Box */}
-          <div className="p-5 rounded-2xl bg-cream-50 border border-cream-300 text-left space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-cream-200 pb-3 text-xs font-bold text-navy-950">
+          <div className="p-3.5 sm:p-5 rounded-2xl bg-cream-50 border border-cream-300 text-left space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-cream-200 pb-2.5 text-xs font-bold text-navy-950">
               <span>Registered Family Summary ({family.members.length} Members)</span>
-              <span className="text-slate-600 font-bold font-mono bg-cream-200/80 px-2.5 py-1 rounded-lg border border-cream-300">
+              <span className="text-slate-600 font-bold font-mono text-[11px] bg-cream-200/80 px-2 py-0.5 rounded-lg border border-cream-300">
                 HOF ITS: {family.hofItsId}
               </span>
             </div>
 
             <div className="space-y-2">
               {family.members.map((m: any) => (
-                <div key={m.id} className="flex items-center justify-between text-xs p-3.5 rounded-xl bg-white border border-cream-300 shadow-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-navy-950 text-sm">{m.name}</span>
+                <div key={m.id} className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-1.5 text-xs p-3 rounded-xl bg-white border border-cream-300 shadow-sm">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="font-bold text-navy-950 text-xs sm:text-sm truncate">{m.name}</span>
                     {m.isHof && (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-black bg-gold-600 text-white">HOF</span>
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-gold-600 text-white shrink-0">HOF</span>
                     )}
                   </div>
-                  <span className="text-slate-600 font-mono font-bold text-xs bg-cream-100 px-2.5 py-1 rounded-lg border border-cream-200">
+                  <span className="text-slate-600 font-mono font-bold text-[11px] bg-cream-100 px-2 py-0.5 rounded-lg border border-cream-200 shrink-0">
                     ITS: {m.itsId}
                   </span>
                 </div>
@@ -194,26 +194,26 @@ export default function PassesPage() {
                 <button
                   key={member.id}
                   onClick={() => setActiveMemberPass(member)}
-                  className={`w-full text-left p-3.5 rounded-xl border transition flex items-center justify-between ${
+                  className={`w-full text-left p-3.5 rounded-xl border transition flex items-center justify-between gap-2 ${
                     isSelected
                       ? "bg-navy-900 text-white border-navy-900 shadow-md"
                       : "bg-white text-navy-950 border-cream-300 hover:border-gold-500"
                   }`}
                 >
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-sm">{member.name}</span>
+                      <span className="font-bold text-xs sm:text-sm truncate">{member.name}</span>
                       {member.isHof && (
-                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-black ${isSelected ? "bg-gold-600 text-white" : "bg-cream-200 text-navy-900"}`}>
+                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-black shrink-0 ${isSelected ? "bg-gold-600 text-white" : "bg-cream-200 text-navy-900"}`}>
                           HOF
                         </span>
                       )}
                     </div>
-                    <p className={`text-xs mt-0.5 font-medium ${isSelected ? "text-cream-100" : "text-slate-500"}`}>
+                    <p className={`text-[11px] sm:text-xs mt-0.5 font-medium truncate ${isSelected ? "text-cream-100" : "text-slate-500"}`}>
                       ITS: {member.itsId} · {member.gender}
                     </p>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 shrink-0">
                     {isCheckedIn && (
                       <CheckCircle2 className={`w-4 h-4 ${isSelected ? "text-gold-400" : "text-emerald-600"}`} />
                     )}
@@ -228,29 +228,29 @@ export default function PassesPage() {
           <div className="md:col-span-2">
             {activeMemberPass ? (
               <div
-                className="printable-pass-card bg-sky-50 rounded-xl p-6 border-2 border-black shadow-xl space-y-4 text-center relative overflow-hidden select-none text-black"
+                className="printable-pass-card bg-sky-50 rounded-xl p-4 sm:p-6 border-2 border-black shadow-xl space-y-4 text-center relative overflow-hidden select-none text-black"
               >
                 {/* Event Header Info */}
                 <div className="border-b-2 border-black pb-3 space-y-1 text-left">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[11px] font-black tracking-widest uppercase text-black">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[10px] sm:text-[11px] font-black tracking-widest uppercase text-black truncate">
                       ANJUMAN E NAJMI KHOPOLI
                     </p>
-                    <span className="px-2.5 py-0.5 rounded text-[10px] font-black uppercase bg-black text-white border border-black tracking-wider">
+                    <span className="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black uppercase bg-black text-white border border-black tracking-wider shrink-0">
                       RELAY PASS
                     </span>
                   </div>
-                  <h3 className="text-base font-black text-black text-left pt-0.5">
+                  <h3 className="text-xs sm:text-base font-black text-black text-left pt-0.5 leading-snug">
                     {event?.name || "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H"}
                   </h3>
-                  <div className="flex flex-wrap items-center justify-start gap-3 text-xs text-black font-bold pt-1 text-left">
+                  <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 text-[11px] sm:text-xs text-black font-bold pt-1 text-left">
                     <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-black" />
+                      <Calendar className="w-3.5 h-3.5 text-black shrink-0" />
                       {event?.date || "16th Rabi al-Awwal 1448H"}
                     </span>
                     <span>·</span>
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-black" />
+                      <MapPin className="w-3.5 h-3.5 text-black shrink-0" />
                       {event?.venue || "Maharaja Lawns - Khopoli"}
                     </span>
                   </div>
@@ -259,7 +259,7 @@ export default function PassesPage() {
                 {/* Member Pass Identity Info */}
                 <div className="space-y-3 pt-1">
                   <div>
-                    <div className="inline-flex flex-wrap items-center justify-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black text-xs font-black text-black shadow-sm">
+                    <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full bg-white border border-black text-[11px] sm:text-xs font-black text-black shadow-sm">
                       <span>ITS ID: {activeMemberPass.itsId}</span>
                       <span>·</span>
                       <span>{activeMemberPass.gender}</span>
@@ -268,7 +268,7 @@ export default function PassesPage() {
                     </div>
                   </div>
 
-                  <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight">
+                  <h2 className="text-xl sm:text-3xl font-black text-black tracking-tight break-words leading-tight">
                     {activeMemberPass.name}
                   </h2>
 
@@ -277,8 +277,8 @@ export default function PassesPage() {
                   </p>
 
                   {/* Pass Token Badge */}
-                  <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
-                    <span className="inline-block px-3.5 py-1.5 bg-black text-white rounded-lg text-xs font-mono font-black tracking-widest uppercase shadow">
+                  <div className="pt-1 sm:pt-2 flex flex-wrap items-center justify-center gap-2">
+                    <span className="inline-block px-3 py-1.5 bg-black text-white rounded-lg text-[10px] sm:text-xs font-mono font-black tracking-wider sm:tracking-widest uppercase shadow break-all">
                       TOKEN: {activeMemberPass.pass?.qrToken || `KRC-URS1448H-${activeMemberPass.itsId}`}-{String(activeMemberPass.passNumber || 1).padStart(2, "0")}
                     </span>
                   </div>
@@ -288,7 +288,7 @@ export default function PassesPage() {
                     <p className="text-xs font-black uppercase text-black tracking-wider">
                       📋 Important Instructions:
                     </p>
-                    <ul className="text-[11px] font-bold text-black space-y-1 pl-4 list-disc leading-relaxed">
+                    <ul className="text-[10px] sm:text-[11px] font-bold text-black space-y-1.5 pl-4 list-disc leading-relaxed">
                       <li>ITS Card number will be matched and verified with this pass at entry.</li>
                       <li>Please bring your physical ITS Card along with this digital pass.</li>
                       <li>Venue gates will open at 9:00 AM.</li>
