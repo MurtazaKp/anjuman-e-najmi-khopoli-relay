@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getActiveEvent, getFormattedRegistrationData } from "@/lib/events";
-import { syncToGoogleSheetWebhook } from "@/lib/googlesheets";
+import { syncFullStoreToGoogleSheet } from "@/lib/googlesheets";
 
 export const dynamic = 'force-dynamic';
 
@@ -21,26 +21,15 @@ export async function POST() {
       });
     }
 
-    let syncedCount = 0;
-    let lastError = null;
+    const res = await syncFullStoreToGoogleSheet({
+      eventName,
+      familyGroups,
+    });
 
-    for (const family of familyGroups) {
-      const res = await syncToGoogleSheetWebhook({
-        eventName,
-        family,
-      });
-
-      if (res.synced) {
-        syncedCount++;
-      } else {
-        lastError = res.error || res.message;
-      }
-    }
-
-    if (syncedCount === 0 && lastError) {
+    if (!res.synced) {
       return NextResponse.json(
         {
-          error: `Google Sheet Sync Failed: ${lastError}. Please verify GOOGLE_SHEET_WEBHOOK_URL in .env`,
+          error: `Google Sheet Sync Failed: ${res.error || res.message}. Please verify GOOGLE_SHEET_WEBHOOK_URL in .env`,
         },
         { status: 400 }
       );
@@ -48,8 +37,8 @@ export async function POST() {
 
     return NextResponse.json({
       success: true,
-      message: `Successfully synced ${syncedCount} family registrations to Google Sheet!`,
-      syncedFamilies: syncedCount,
+      message: `Successfully synced ${familyGroups.length} family registrations to Google Sheet cleanly with zero duplicates!`,
+      syncedFamilies: familyGroups.length,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

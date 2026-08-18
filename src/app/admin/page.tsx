@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   FileSpreadsheet,
   QrCode,
+  Users,
   CheckCircle2,
   AlertCircle,
   Settings,
@@ -14,7 +15,8 @@ import {
   LogOut,
   ShieldAlert,
   KeyRound,
-  Trash2
+  Trash2,
+  ExternalLink
 } from "lucide-react";
 
 // Authorized Administrator Emails
@@ -50,11 +52,11 @@ export default function AdminPage() {
     if (savedEmail && AUTHORIZED_ADMIN_EMAILS.includes(savedEmail.toLowerCase())) {
       setAuthenticatedEmail(savedEmail.toLowerCase());
     }
+    fetchActiveEvent();
   }, []);
 
   const fetchActiveEvent = async () => {
     try {
-      setLoading(true);
       const res = await fetch("/api/events/active");
       const data = await res.json();
       if (data.event) setEvent(data.event);
@@ -64,12 +66,6 @@ export default function AdminPage() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (authenticatedEmail) {
-      fetchActiveEvent();
-    }
-  }, [authenticatedEmail]);
 
   // Handle Admin Email / Direct PIN Verification
   const handleEmailSubmit = (e: React.FormEvent) => {
@@ -161,8 +157,9 @@ export default function AdminPage() {
       setStatusUpdating(false);
 
       if (res.ok) {
-        setEvent(data.event);
+        if (data.event) setEvent(data.event);
         setActionMsg(`Event status updated to ${newStatus}`);
+        fetchActiveEvent();
       } else {
         setErrorMsg(data.error || "Failed to update status");
       }
@@ -405,6 +402,16 @@ export default function AdminPage() {
           </button>
 
           <a
+            href="https://docs.google.com/spreadsheets/d/1xp75B9scBNHy1BobMFhgUwaV41JV39IUnKyz8W-Wwts"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 border border-emerald-500"
+          >
+            <ExternalLink className="w-4 h-4 text-white shrink-0" />
+            <span>Open Live Google Sheet</span>
+          </a>
+
+          <a
             href="/api/export?format=excel"
             download
             className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-navy-900 hover:bg-navy-800 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2"
@@ -422,6 +429,57 @@ export default function AdminPage() {
             <span>Download CSV</span>
           </a>
         </div>
+      </section>
+
+      {/* Live Capacity Progress Card */}
+      <section className="bg-white rounded-2xl p-4 sm:p-6 border border-cream-300 premium-card space-y-3">
+        <div className="flex items-center justify-between font-black text-navy-950 text-sm sm:text-base">
+          <div className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-gold-600 shrink-0" />
+            <span>Event Capacity & Registration Progress</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={fetchActiveEvent}
+              className="p-1.5 rounded-lg bg-cream-100 hover:bg-cream-200 text-navy-950 transition border border-cream-300"
+              title="Refresh live capacity count"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+            </button>
+            <span className="text-xs font-black px-2.5 py-1 rounded-full bg-cream-100 text-navy-950 border border-cream-300">
+              {event?.weightedCapacityCount !== undefined ? event.weightedCapacityCount : (event?.totalRegisteredMembers || 0)} / {event?.maxCapacity || 15} Capacity Units
+            </span>
+          </div>
+        </div>
+
+        {/* Capacity Progress Bar */}
+        <div className="space-y-1.5">
+          <div className="w-full bg-cream-200 rounded-full h-3.5 overflow-hidden border border-cream-300">
+            <div
+              className={`h-full transition-all duration-500 ${
+                (event?.weightedCapacityCount !== undefined ? event.weightedCapacityCount : (event?.totalRegisteredMembers || 0)) >= (event?.maxCapacity || 15)
+                  ? "bg-red-600"
+                  : (event?.weightedCapacityCount !== undefined ? event.weightedCapacityCount : (event?.totalRegisteredMembers || 0)) > (event?.maxCapacity || 15) * 0.8
+                  ? "bg-amber-500"
+                  : "bg-gold-600"
+              }`}
+              style={{
+                width: `${Math.min(100, Math.round(((event?.weightedCapacityCount !== undefined ? event.weightedCapacityCount : (event?.totalRegisteredMembers || 0)) / (event?.maxCapacity || 15)) * 100))}%`,
+              }}
+            ></div>
+          </div>
+          <div className="flex justify-between text-[11px] font-bold text-slate-500">
+            <span>Capacity Used: {event?.weightedCapacityCount || 0} Units ({event?.totalRegisteredMembers || 0} Members in {event?.totalFamilies || 0} Families)</span>
+            <span>Limit: {event?.maxCapacity || 15} Units</span>
+          </div>
+        </div>
+
+        {(event?.weightedCapacityCount !== undefined ? event.weightedCapacityCount : (event?.totalRegisteredMembers || 0)) >= (event?.maxCapacity || 15) && (
+          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs font-bold flex items-center gap-2">
+            <Lock className="w-4 h-4 text-red-600 shrink-0" />
+            <span>Capacity Full! Registration is automatically CLOSED.</span>
+          </div>
+        )}
       </section>
 
       {/* 2. Automated Pass Generation Section */}

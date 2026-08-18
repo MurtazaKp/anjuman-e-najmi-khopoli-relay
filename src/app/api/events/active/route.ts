@@ -24,7 +24,8 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { eventId, status } = body;
 
-    const event = await updateEventStatus(eventId, status);
+    await updateEventStatus(eventId, status);
+    const event = await getActiveEvent();
     return NextResponse.json({ success: true, event });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 400 });

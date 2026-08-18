@@ -18,6 +18,7 @@ export async function POST() {
     }
 
     const result = await generatePassesForEvent(event.id);
+
     return NextResponse.json({
       success: true,
       message: `Generated digital passes for ${result.passesCreated} family members!`,

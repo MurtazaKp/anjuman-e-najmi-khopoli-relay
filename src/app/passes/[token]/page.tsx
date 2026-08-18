@@ -210,7 +210,7 @@ export default function PassesPage() {
                       )}
                     </div>
                     <p className={`text-[11px] sm:text-xs mt-0.5 font-medium truncate ${isSelected ? "text-cream-100" : "text-slate-500"}`}>
-                      ITS: {member.itsId} · {member.gender}
+                      ITS: {member.itsId} · {member.gender} {(member.type === "Child" || member.type === "Gair Baliqh") ? "· Gair Baliqh" : ""}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
@@ -231,25 +231,40 @@ export default function PassesPage() {
                 className="printable-pass-card bg-sky-50 rounded-xl p-4 sm:p-6 border-2 border-black shadow-xl space-y-4 text-center relative overflow-hidden select-none text-black"
               >
                 {/* Event Header Info */}
-                <div className="border-b-2 border-black pb-3 space-y-1 text-left">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[10px] sm:text-[11px] font-black tracking-widest uppercase text-black truncate">
-                      ANJUMAN E NAJMI KHOPOLI
-                    </p>
-                    <span className="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black uppercase bg-black text-white border border-black tracking-wider shrink-0">
-                      RELAY PASS
-                    </span>
+                <div className="space-y-2 text-center">
+                  {/* Top Row: 2x Extra Large Logo (No Border) + Anjuman Text, Centered Big RELAY PASS badge */}
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-black/20 pb-3">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src="/logo.jpg"
+                        alt="Anjuman E Najmi Khopoli"
+                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover shrink-0 shadow-sm"
+                      />
+                      <p className="text-[10px] sm:text-xs font-black tracking-widest uppercase text-black text-left leading-tight">
+                        ANJUMAN E NAJMI<br />KHOPOLI
+                      </p>
+                    </div>
+                    
+                    <div className="mx-auto sm:mx-0">
+                      <span className="inline-block px-5 py-2 rounded-xl text-xs sm:text-sm font-black uppercase bg-black text-white border-2 border-black tracking-widest shrink-0 shadow-md">
+                        RELAY PASS
+                      </span>
+                    </div>
                   </div>
-                  <h3 className="text-xs sm:text-base font-black text-black text-left pt-0.5 leading-snug">
+
+                  {/* Main Event Title - Single Line Fit */}
+                  <h3 className="text-[10px] sm:text-xs font-black text-black text-center pt-1 leading-snug whitespace-nowrap tracking-tight overflow-hidden">
                     {event?.name || "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H"}
                   </h3>
-                  <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 text-[11px] sm:text-xs text-black font-bold pt-1 text-left">
-                    <span className="flex items-center gap-1">
+
+                  {/* Refined Divider Line with Venue & 16 Rabi al-Awwal Below Line */}
+                  <div className="border-t border-black/30 pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-black font-extrabold text-center">
+                    <span className="flex items-center gap-1 font-black">
                       <Calendar className="w-3.5 h-3.5 text-black shrink-0" />
                       {event?.date || "16th Rabi al-Awwal 1448H"}
                     </span>
                     <span>·</span>
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 font-black">
                       <MapPin className="w-3.5 h-3.5 text-black shrink-0" />
                       {event?.venue || "Maharaja Lawns - Khopoli"}
                     </span>
@@ -259,12 +274,16 @@ export default function PassesPage() {
                 {/* Member Pass Identity Info */}
                 <div className="space-y-3 pt-1">
                   <div>
-                    <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full bg-white border border-black text-[11px] sm:text-xs font-black text-black shadow-sm">
+                    <div className="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 px-3.5 py-1.5 rounded-full bg-white border border-black text-[11px] sm:text-xs font-black text-black shadow-sm">
                       <span>ITS ID: {activeMemberPass.itsId}</span>
                       <span>·</span>
                       <span>{activeMemberPass.gender}</span>
-                      <span>·</span>
-                      <span>{activeMemberPass.type}</span>
+                      {(activeMemberPass.type === "Child" || activeMemberPass.type === "Gair Baliqh") && (
+                        <>
+                          <span>·</span>
+                          <span>Gair Baliqh</span>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -283,18 +302,18 @@ export default function PassesPage() {
                     </span>
                   </div>
 
-                  {/* Important Instructions Section */}
+                  {/* Important Instructions Section with Highlighted Words */}
                   <div className="border-t-2 border-black/20 pt-3 text-left space-y-2">
                     <p className="text-xs font-black uppercase text-black tracking-wider">
                       📋 Important Instructions:
                     </p>
                     <ul className="text-[10px] sm:text-[11px] font-bold text-black space-y-1.5 pl-4 list-disc leading-relaxed">
-                      <li>ITS Card number will be matched and verified with this pass at entry.</li>
-                      <li>Please bring your physical ITS Card along with this digital pass.</li>
-                      <li>Venue gates will open at 9:00 AM.</li>
-                      <li><strong>Parking Note:</strong> Park your car at designated parking space and a Khidmatguzar will guide you in parking.</li>
-                      <li>Bring your own chair if required for sitting.</li>
-                      <li>Bring an umbrella in case of rainy weather.</li>
+                      <li><strong>ITS Card Matching:</strong> ITS Card number will be matched and verified with this pass at entry.</li>
+                      <li><strong>Physical ITS Card:</strong> Please bring your physical ITS Card along with this digital pass.</li>
+                      <li><strong>Venue Gates:</strong> Gates will open at 9:00 AM.</li>
+                      <li><strong>Parking Note & Guidance:</strong> Park your car at designated parking space and a Khidmatguzar will guide you in parking.</li>
+                      <li><strong>Bring Your Own Chair:</strong> If required for sitting.</li>
+                      <li><strong>Bring An Umbrella:</strong> In case of rainy weather.</li>
                     </ul>
                   </div>
                 </div>

@@ -220,13 +220,37 @@ export function saveStore(store: AppStore) {
   }
 }
 
+export const MAX_EVENT_CAPACITY = 1400;
+
 /**
- * Get current active event
+ * Calculate weighted seat count: Adult = 1.0, Child (Gair Baliqh) = 0.5
  */
-export function getActiveEventData(): EventData {
+export function calculateWeightedMemberCount(members: { type?: string }[]): number {
+  return members.reduce((sum, m) => sum + (m.type === "Child" ? 0.5 : 1.0), 0);
+}
+
+/**
+ * Get current active event with live capacity counts
+ */
+export function getActiveEventData(): EventData & { totalRegisteredMembers: number; weightedCapacityCount: number; totalFamilies: number; maxCapacity: number } {
   const store = getStore();
   const current = store.events.find((e) => e.isCurrent) || store.events[0];
-  return current || DEFAULT_EVENT;
+  const activeEvent = current || DEFAULT_EVENT;
+
+  const eventFamilies = store.families.filter((f) => !f.eventId || f.eventId === activeEvent.id);
+  const totalRegisteredMembers = eventFamilies.reduce((acc, f) => acc + f.members.length, 0);
+  const weightedCapacityCount = eventFamilies.reduce(
+    (acc, f) => acc + calculateWeightedMemberCount(f.members),
+    0
+  );
+
+  return {
+    ...activeEvent,
+    totalRegisteredMembers,
+    weightedCapacityCount,
+    totalFamilies: eventFamilies.length,
+    maxCapacity: MAX_EVENT_CAPACITY,
+  };
 }
 
 /**
@@ -315,6 +339,17 @@ export async function registerFamilyData(
     }
   }
 
+  // Check Weighted Capacity Limit before registration (Adult = 1.0, Child = 0.5)
+  const currentWeightedCount = store.families
+    .filter((f) => f.eventId === eventId)
+    .reduce((acc, f) => acc + calculateWeightedMemberCount(f.members), 0);
+
+  if (currentWeightedCount >= MAX_EVENT_CAPACITY) {
+    event.status = "REGISTRATION_CLOSED";
+    saveStore(store);
+    throw new Error("Registration is officially CLOSED due to Capacity Full.");
+  }
+
   const familyId = `fam-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   const passLinkToken = `pass-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
@@ -348,6 +383,13 @@ export async function registerFamilyData(
   };
 
   store.families.push(newFamily);
+
+  // Auto-close registration if weighted capacity reaches limit
+  const newWeightedCount = currentWeightedCount + calculateWeightedMemberCount(allMembersInput);
+  if (newWeightedCount >= MAX_EVENT_CAPACITY) {
+    event.status = "REGISTRATION_CLOSED";
+  }
+
   saveStore(store);
 
   // Sync to Google Sheets

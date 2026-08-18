@@ -19,6 +19,57 @@
       "isCurrent": true
     }
   ],
-  "families": [],
+  "families": [
+    {
+      "id": "fam-1787073506900-455",
+      "eventId": "event-urs-1448h",
+      "hofName": "Murtaza Khopoliwala",
+      "hofItsId": "50499558",
+      "mobileNumber": "9403825153",
+      "mauze": "Lonavala",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "Yes, Jami ne Jaisu",
+      "niyazContribution": "121000",
+      "passLinkToken": "pass-1787073506901-gchrao",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-08-18T17:18:26.901Z",
+      "members": [
+        {
+          "id": "mem-fam-1787073506900-455-1",
+          "familyId": "fam-1787073506900-455",
+          "eventId": "event-urs-1448h",
+          "itsId": "50499558",
+          "name": "Murtaza Khopoliwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-08-18T17:18:26.901Z"
+        },
+        {
+          "id": "mem-fam-1787073506900-455-2",
+          "familyId": "fam-1787073506900-455",
+          "eventId": "event-urs-1448h",
+          "itsId": "20393833",
+          "name": "Aliasgar Khopoliwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": false,
+          "createdAt": "2026-08-18T17:18:26.901Z"
+        },
+        {
+          "id": "mem-fam-1787073506900-455-3",
+          "familyId": "fam-1787073506900-455",
+          "eventId": "event-urs-1448h",
+          "itsId": "50499560",
+          "name": "Tasneem",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": false,
+          "createdAt": "2026-08-18T17:18:26.901Z"
+        }
+      ]
+    }
+  ],
   "passes": []
 }

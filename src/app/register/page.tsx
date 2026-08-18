@@ -20,7 +20,9 @@ import {
   PhoneCall,
   Info,
   Lock,
-  Loader2
+  Loader2,
+  MessageCircle,
+  Home
 } from "lucide-react";
 import DigitalQrCard from "@/components/DigitalQrCard";
 
@@ -87,6 +89,7 @@ export default function RegisterPage() {
   const [modalErrorMsg, setModalErrorMsg] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [submittedPassToken, setSubmittedPassToken] = useState("");
 
   // Real-time backend ITS verification
   const verifyItsIdBackend = async (itsId: string, setErrorTarget?: (msg: string) => void): Promise<boolean> => {
@@ -274,10 +277,11 @@ export default function RegisterPage() {
         return;
       }
 
+      if (data.passLinkToken) {
+        setSubmittedPassToken(data.passLinkToken);
+      }
+
       setSuccess(true);
-      setTimeout(() => {
-        router.push(`/?registered=true&token=${data.passLinkToken}`);
-      }, 2000);
     } catch (err: any) {
       setSubmitting(false);
       setErrorMsg(err.message || "Network error. Please try again.");
@@ -286,16 +290,48 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="bg-white rounded-3xl p-8 border border-cream-300 premium-card text-center max-w-md mx-auto space-y-4 my-8 animate-fade-in">
-        <div className="w-16 h-16 bg-cream-100 rounded-full flex items-center justify-center mx-auto text-gold-600 border border-gold-400">
+      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-cream-300 premium-card text-center max-w-lg mx-auto space-y-6 my-8 animate-fade-in shadow-xl">
+        <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-600 border-2 border-emerald-500 shadow-sm">
           <CheckCircle2 className="w-10 h-10" />
         </div>
-        <h2 className="text-2xl font-black text-navy-950">Registration Successful!</h2>
-        <p className="text-sm text-navy-900 font-medium">
-          Your family registration for the Waaz Mubarak Relay & Niyaz has been recorded. Redirecting to homepage...
-        </p>
-        <div className="w-full bg-cream-200 rounded-full h-1.5 overflow-hidden">
-          <div className="bg-gold-600 h-full w-full animate-pulse"></div>
+
+        <div className="space-y-2">
+          <h2 className="text-2xl sm:text-3xl font-black text-navy-950">Registration Successful! 🎉</h2>
+          <p className="text-sm text-slate-700 font-medium leading-relaxed max-w-md mx-auto">
+            Mubarak! Your family registration for <strong>Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H</strong> has been successfully recorded.
+          </p>
+        </div>
+
+        {/* WhatsApp Group Join Card */}
+        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 border-2 border-emerald-200 text-left space-y-3 shadow-inner">
+          <div className="flex items-center gap-2 text-emerald-950 font-black text-sm">
+            <MessageCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+            <span>Join Official Relay Updates WhatsApp Group</span>
+          </div>
+          <p className="text-xs text-slate-600 leading-relaxed font-medium">
+            Please join our official WhatsApp group to receive instant venue announcements, parking guidance, and pass alerts directly from Jamaat Khidmatguzars.
+          </p>
+          <a
+            href="https://chat.whatsapp.com/Ip8Eic5EwiW896g96RnqaC"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-md cursor-pointer text-center"
+          >
+            <MessageCircle className="w-5 h-5 fill-white text-emerald-600" />
+            <span>Join WhatsApp Group Now</span>
+            <ArrowRight className="w-4 h-4" />
+          </a>
+        </div>
+
+        {/* Navigation Button */}
+        <div className="pt-2">
+          <Link
+            href={submittedPassToken ? `/?registered=true&token=${submittedPassToken}` : "/"}
+            className="w-full py-3.5 px-4 rounded-xl bg-navy-950 hover:bg-navy-900 active:scale-[0.99] text-white font-black text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-md"
+          >
+            <Home className="w-4 h-4 text-gold-400" />
+            <span>Go to Homepage</span>
+          </Link>
         </div>
       </div>
     );
@@ -872,7 +908,7 @@ export default function RegisterPage() {
                     className="w-full px-3 py-2 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none bg-white font-bold text-navy-950"
                   >
                     <option value="Adult">Adult</option>
-                    <option value="Child">Child (Gair Baligh)</option>
+                    <option value="Child">Gair Baliqh</option>
                   </select>
                 </div>
               </div>

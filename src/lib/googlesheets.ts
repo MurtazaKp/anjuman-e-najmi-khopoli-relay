@@ -53,7 +53,7 @@ export function buildFormattedSheetRows(eventName: string, familyGroups: Formatt
         member.name,
         member.status,
         member.gender,
-        member.type,
+        member.type === "Child" ? "Gair Baliqh" : "Adult",
         member.mobileNumber,
         family.mauze || "—",
         family.transportMode || "—",
@@ -79,7 +79,7 @@ export function generateExcelBuffer(eventName: string, familyGroups: FormattedFa
     { wch: 26 },
     { wch: 18 },
     { wch: 10 },
-    { wch: 10 },
+    { wch: 12 },
     { wch: 16 },
     { wch: 16 },
     { wch: 16 },
@@ -99,11 +99,11 @@ export function generateCSVString(eventName: string, familyGroups: FormattedFami
 }
 
 /**
- * Live sync to Google Sheets Webhook (Apps Script / Google API)
+ * Live bulk sync to Google Sheets Webhook (Clears duplicates and rewrites formatted sheet)
  */
-export async function syncToGoogleSheetWebhook(data: {
+export async function syncFullStoreToGoogleSheet(data: {
   eventName: string;
-  family: FormattedFamilyGroup;
+  familyGroups: FormattedFamilyGroup[];
 }) {
   const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
   if (!webhookUrl || webhookUrl.includes("placeholder")) {
@@ -112,10 +112,17 @@ export async function syncToGoogleSheetWebhook(data: {
   }
 
   try {
+    const formattedRows = buildFormattedSheetRows(data.eventName, data.familyGroups);
+
     const res = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        action: "FULL_SYNC",
+        eventName: data.eventName,
+        familyGroups: data.familyGroups,
+        rows: formattedRows,
+      }),
       redirect: 'follow',
     });
 
@@ -130,6 +137,40 @@ export async function syncToGoogleSheetWebhook(data: {
           ? "Google 403 Forbidden: In Google Apps Script, click Deploy > New Deployment (Version: New version, Who has access: Anyone) to grant access."
           : `${res.status} ${res.statusText}`,
       };
+    }
+  } catch (err: any) {
+    console.error("[Google Sheets Sync] Error sending to webhook:", err.message);
+    return { success: false, synced: false, error: err.message };
+  }
+}
+
+export async function syncToGoogleSheetWebhook(data: {
+  eventName: string;
+  family: FormattedFamilyGroup;
+}) {
+  const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
+  if (!webhookUrl || webhookUrl.includes("placeholder")) {
+    console.log("[Google Sheets Sync] Webhook URL not configured yet");
+    return { success: true, synced: false, message: "Webhook URL not configured" };
+  }
+
+  try {
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: "SINGLE_FAMILY",
+        eventName: data.eventName,
+        family: data.family,
+      }),
+      redirect: 'follow',
+    });
+
+    if (res.ok) {
+      return { success: true, synced: true };
+    } else {
+      console.error("[Google Sheets Sync] Webhook failed:", res.status, res.statusText);
+      return { success: false, synced: false, error: `${res.status} ${res.statusText}` };
     }
   } catch (err: any) {
     console.error("[Google Sheets Sync] Error sending to webhook:", err.message);
