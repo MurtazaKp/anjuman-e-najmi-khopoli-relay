@@ -91,10 +91,6 @@ export default function EventHomepage() {
             {event?.name || "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H"}
           </h1>
 
-          <p className="text-cream-100 text-[11px] sm:text-sm leading-relaxed max-w-2xl font-medium drop-shadow">
-            {event?.description}
-          </p>
-
           {/* Quick Info Pills */}
           <div className="pt-1.5 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] sm:text-xs text-amber-200 font-bold">
             <div className="flex items-center gap-2 bg-navy-950/80 px-3 py-2 rounded-xl backdrop-blur-md border border-gold-600/50 shadow">
