@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { FormattedFamilyGroup, syncToGoogleSheetWebhook } from "./googlesheets";
+import { supabase, isSupabaseConfigured } from "./supabase";
 
 export interface EventData {
   id: string;
@@ -203,7 +204,95 @@ export function getStore(): AppStore {
 }
 
 /**
- * Save store to JSON file (supports Vercel serverless /tmp)
+ * Sync store data asynchronously to Supabase PostgreSQL database
+ */
+export async function syncStoreToSupabase(store: AppStore) {
+  if (!isSupabaseConfigured || !supabase) return;
+
+  try {
+    // 1. Sync Events
+    if (store.events.length > 0) {
+      const eventRows = store.events.map((e) => ({
+        id: e.id,
+        slug: e.slug,
+        name: e.name,
+        description: e.description,
+        date: e.date,
+        time: e.time,
+        venue: e.venue,
+        location: e.location,
+        map_url: e.mapUrl,
+        parking_map_url: (e as any).parkingMapUrl,
+        latitude: e.latitude,
+        longitude: e.longitude,
+        registration_start: e.registrationStart,
+        registration_end: e.registrationEnd,
+        status: e.status,
+        is_current: e.isCurrent,
+        pass_issue_date: e.passIssueDate,
+      }));
+      await supabase.from("events").upsert(eventRows);
+    }
+
+    // 2. Sync Families & Members
+    if (store.families.length > 0) {
+      const familyRows = store.families.map((f) => ({
+        id: f.id,
+        event_id: f.eventId,
+        hof_name: f.hofName,
+        hof_its_id: f.hofItsId,
+        mobile_number: f.mobileNumber,
+        mauze: f.mauze,
+        transport_mode: f.transportMode,
+        rajab_roza_count: f.rajabRozaCount || 0,
+        niyaz_jaman: f.niyazJaman,
+        niyaz_contribution: f.niyazContribution,
+        pass_link_token: f.passLinkToken,
+        whatsapp_status: f.whatsappStatus,
+        created_at: f.createdAt,
+      }));
+      await supabase.from("families").upsert(familyRows);
+
+      const allMembers = store.families.flatMap((f) => f.members);
+      if (allMembers.length > 0) {
+        const memberRows = allMembers.map((m) => ({
+          id: m.id,
+          family_id: m.familyId,
+          event_id: m.eventId,
+          its_id: m.itsId,
+          name: m.name,
+          gender: m.gender,
+          type: m.type,
+          is_hof: m.isHof,
+          created_at: m.createdAt,
+        }));
+        await supabase.from("members").upsert(memberRows);
+      }
+    }
+
+    // 3. Sync Passes
+    if (store.passes.length > 0) {
+      const passRows = store.passes.map((p) => ({
+        id: p.id,
+        family_id: p.familyId,
+        event_id: p.eventId,
+        member_id: p.memberId,
+        pass_number: p.passNumber,
+        qr_token: p.qrToken,
+        status: p.status,
+        checked_in_at: p.checkedInAt,
+        checked_in_by: p.checkedInBy,
+        created_at: p.createdAt,
+      }));
+      await supabase.from("passes").upsert(passRows);
+    }
+  } catch (err) {
+    console.error("[Supabase Sync Error]", err);
+  }
+}
+
+/**
+ * Save store to JSON file and background sync to Supabase when configured
  */
 export function saveStore(store: AppStore) {
   try {
@@ -215,6 +304,10 @@ export function saveStore(store: AppStore) {
     }
 
     fs.writeFileSync(filePath, JSON.stringify(store, null, 2), "utf-8");
+
+    if (isSupabaseConfigured) {
+      syncStoreToSupabase(store).catch((e) => console.error("[Supabase Save Error]", e));
+    }
   } catch (err) {
     console.error("[Store Error] Failed to save store", err);
   }
