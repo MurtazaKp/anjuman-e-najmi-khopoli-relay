@@ -11,7 +11,12 @@ import {
   Search,
   AlertCircle,
   Info,
-  PhoneCall
+  PhoneCall,
+  Smartphone,
+  CreditCard,
+  Armchair,
+  Car,
+  Users
 } from "lucide-react";
 import DigitalQrCard from "@/components/DigitalQrCard";
 
@@ -23,16 +28,24 @@ export default function EventHomepage() {
   const [searchError, setSearchError] = useState("");
 
   useEffect(() => {
-    fetch("/api/events/active")
+    let isMounted = true;
+    fetch(`/api/events/active?t=${Date.now()}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
-        if (data.event) setEvent(data.event);
-        setLoading(false);
+        if (isMounted) {
+          if (data.event) setEvent(data.event);
+        }
       })
       .catch((err) => {
-        console.error(err);
-        setLoading(false);
+        console.error("Failed to fetch active event:", err);
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false);
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handlePassLookup = (e: React.FormEvent) => {
@@ -247,69 +260,95 @@ export default function EventHomepage() {
       <DigitalQrCard size="large" />
 
       {/* 6. General Instructions Section */}
-      <section className="bg-white rounded-2xl p-4 sm:p-6 border-2 border-gold-500/60 premium-card space-y-4 shadow-md">
-        <div className="flex items-center justify-between gap-2 border-b border-cream-200 pb-3">
-          <div className="flex items-center gap-1.5 font-black text-navy-950 text-sm sm:text-base shrink-0">
-            <Info className="w-4 h-4 sm:w-5 sm:h-5 text-gold-600 shrink-0" />
+      <section className="bg-white rounded-3xl p-5 sm:p-7 border border-cream-300 premium-card space-y-4 shadow-xl">
+        <div className="flex items-center justify-between gap-2 border-b border-cream-200 pb-3.5">
+          <div className="flex items-center gap-2 font-black text-navy-950 text-base sm:text-lg shrink-0">
+            <Info className="w-5 h-5 text-gold-600 shrink-0" />
             <span className="whitespace-nowrap">General Instructions</span>
           </div>
-          <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 sm:px-2.5 py-0.5 sm:py-1 bg-gold-600 text-white rounded-full shrink-0 whitespace-nowrap">
+          <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-3 py-1 bg-gold-600 text-white rounded-full shrink-0 shadow-sm">
             Important Notice
           </span>
         </div>
 
-        <ul className="space-y-3 text-xs sm:text-sm text-navy-950">
-          <li className="p-3.5 rounded-xl bg-navy-950 text-white font-bold leading-relaxed flex items-start gap-2.5 shadow-md border border-gold-500/40">
-            <span className="text-base shrink-0">📱</span>
-            <div>
-              <span className="font-extrabold text-gold-400 text-sm block">Digital Entry Pass:</span>
-              <span className="text-xs text-cream-100 font-semibold">
-                Mumineen must <strong>show their digital pass screen on their mobile phone at the entrance counter to gain entry</strong> to the venue.
-              </span>
+        <div className="border border-cream-300 rounded-2xl bg-cream-50/50 divide-y divide-cream-200/80 overflow-hidden text-xs sm:text-sm">
+          {/* Instruction Item 1: Digital Entry Pass */}
+          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
+            <div className="w-7 h-7 rounded-full bg-navy-950 text-gold-400 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+              <Smartphone className="w-4 h-4" />
             </div>
-          </li>
-
-          <li className="p-3.5 rounded-xl bg-gold-600 text-white font-bold leading-relaxed flex items-start gap-2.5 shadow-md border border-gold-400">
-            <span className="text-base shrink-0">💳</span>
-            <div>
-              <span className="font-extrabold text-white text-sm block">Bring Physical ITS Card:</span>
-              <span className="text-xs text-cream-100 font-semibold">
-                Kindly <strong>bring your physical ITS card for scanning and verification</strong> at the entrance counter.
+            <div className="space-y-0.5">
+              <span className="font-extrabold text-navy-950 block text-xs sm:text-sm">
+                Digital Entry Pass:
               </span>
+              <p className="text-slate-700 font-medium leading-relaxed text-xs">
+                Mumineen must <strong className="text-navy-950 font-bold underline decoration-gold-500/50">show their digital pass screen on mobile phone at the entrance counter</strong> to gain entry.
+              </p>
             </div>
-          </li>
+          </div>
 
-          <li className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 font-bold text-amber-950 leading-relaxed flex items-start gap-2.5 shadow-sm">
-            <span className="text-base shrink-0">🪑</span>
-            <div>
-              <span className="font-extrabold text-navy-950 text-sm block">Bring Your Own Chair:</span>
-              <span className="text-xs text-amber-900 font-bold">
-                Kindly bring your own chair if required. Chairs will <strong>NOT be provided under any circumstances</strong> at the venue.
+          {/* Instruction Item 2: Physical ITS Card */}
+          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
+            <div className="w-7 h-7 rounded-full bg-gold-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+              <CreditCard className="w-4 h-4" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="font-extrabold text-navy-950 block text-xs sm:text-sm">
+                Bring Physical ITS Card:
               </span>
+              <p className="text-slate-700 font-medium leading-relaxed text-xs">
+                Kindly <strong className="text-navy-950 font-bold underline decoration-gold-500/50">bring your physical ITS card for scanning and verification</strong> at the entrance counter.
+              </p>
             </div>
-          </li>
+          </div>
 
-          <li className="p-3.5 rounded-xl bg-slate-900 text-white font-bold leading-relaxed flex items-start gap-2.5 shadow-md border border-navy-700">
-            <span className="text-base shrink-0">🚘</span>
-            <div>
-              <span className="font-extrabold text-gold-400 text-sm block">🅿️ Parking Note & Guidance:</span>
-              <span className="text-xs text-cream-100 font-semibold">
-                Park your vehicle at designated parking space and <strong>a Khidmatguzar will guide you in parking</strong> upon arrival.
+          {/* Instruction Item 3: Bring Your Own Chair */}
+          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
+            <div className="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+              <Armchair className="w-4 h-4" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="font-extrabold text-navy-950 block text-xs sm:text-sm">
+                Bring Your Own Chair:
               </span>
+              <p className="text-slate-700 font-medium leading-relaxed text-xs">
+                Kindly bring your own chair if required. Chairs will <strong className="text-red-700 font-black">NOT be provided under any circumstances</strong> at the venue.
+              </p>
             </div>
-          </li>
+          </div>
 
-          <li className="p-3.5 rounded-xl bg-cream-100 border border-cream-300 font-bold text-navy-950 leading-relaxed flex items-start gap-2.5">
-            <span className="text-base shrink-0">📌</span>
-            <div>
-              <span className="font-extrabold text-navy-950 text-sm block">Single Family Registration:</span>
-              <span className="text-xs text-slate-700 font-medium">
+          {/* Instruction Item 4: Parking Note & Guidance */}
+          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
+            <div className="w-7 h-7 rounded-full bg-navy-900 text-gold-400 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+              <Car className="w-4 h-4" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="font-extrabold text-navy-950 block text-xs sm:text-sm">
+                Parking Note & Guidance:
+              </span>
+              <p className="text-slate-700 font-medium leading-relaxed text-xs">
+                Park your vehicle at designated parking space and <strong className="text-navy-950 font-bold underline decoration-gold-500/50">a Khidmatguzar will guide you in parking</strong> upon arrival.
+              </p>
+            </div>
+          </div>
+
+          {/* Instruction Item 5: Single Family Registration */}
+          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
+            <div className="w-7 h-7 rounded-full bg-slate-300 text-navy-950 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+              <Users className="w-4 h-4" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="font-extrabold text-navy-950 block text-xs sm:text-sm">
+                Single Family Registration:
+              </span>
+              <p className="text-slate-700 font-medium leading-relaxed text-xs">
                 Please submit only one registration form response per family or group to ensure accurate arrangements.
-              </span>
+              </p>
             </div>
-          </li>
-        </ul>
+          </div>
+        </div>
 
+        {/* Assistance Footer Banner */}
         <div className="pt-3 border-t border-cream-200 flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-navy-950">
           <div className="flex items-center gap-1.5">
             <PhoneCall className="w-4 h-4 text-gold-600 shrink-0" />
