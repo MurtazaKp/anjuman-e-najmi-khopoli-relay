@@ -49,8 +49,13 @@ export default function AdminPage() {
   useEffect(() => {
     // Check local storage for persistent admin session
     const savedEmail = localStorage.getItem("ank_admin_email");
-    if (savedEmail && AUTHORIZED_ADMIN_EMAILS.includes(savedEmail.toLowerCase())) {
-      setAuthenticatedEmail(savedEmail.toLowerCase());
+    if (savedEmail) {
+      const cleanSaved = savedEmail.toLowerCase().trim();
+      if (AUTHORIZED_ADMIN_EMAILS.includes(cleanSaved)) {
+        setAuthenticatedEmail(cleanSaved);
+      } else {
+        localStorage.removeItem("ank_admin_email");
+      }
     }
     fetchActiveEvent();
   }, []);
@@ -67,30 +72,20 @@ export default function AdminPage() {
     }
   };
 
-  // Handle Admin Email / Direct PIN Verification
+  // Handle Admin Email Verification
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError("");
 
     const cleanInput = inputEmail.trim();
     if (!cleanInput) {
-      setAuthError("Please enter your admin email address or PIN 525252.");
-      return;
-    }
-
-    // Direct PIN login support
-    if (cleanInput === ADMIN_VERIFICATION_PIN) {
-      const email = "khopoliwala52@gmail.com";
-      setAuthenticatedEmail(email);
-      localStorage.setItem("ank_admin_email", email);
+      setAuthError("Please enter your authorized admin email address.");
       return;
     }
 
     const cleanEmail = cleanInput.toLowerCase();
     if (!AUTHORIZED_ADMIN_EMAILS.includes(cleanEmail)) {
-      // Allow login if format is valid or default to authorized
-      setAuthenticatedEmail(cleanEmail);
-      localStorage.setItem("ank_admin_email", cleanEmail);
+      setAuthError("Access Denied: This email address is not authorized for Admin access.");
       return;
     }
 
@@ -102,12 +97,18 @@ export default function AdminPage() {
     e.preventDefault();
     setAuthError("");
 
-    if (inputPin.trim() !== ADMIN_VERIFICATION_PIN) {
-      setAuthError("Incorrect Admin Security PIN. Please enter PIN 525252.");
+    const cleanEmail = inputEmail.trim().toLowerCase();
+    if (!AUTHORIZED_ADMIN_EMAILS.includes(cleanEmail)) {
+      setAuthError("Access Denied: Unauthorized admin email address.");
+      setAuthStep(1);
       return;
     }
 
-    const cleanEmail = inputEmail.trim().toLowerCase() || "khopoliwala52@gmail.com";
+    if (inputPin.trim() !== ADMIN_VERIFICATION_PIN) {
+      setAuthError("Incorrect Admin Security PIN.");
+      return;
+    }
+
     setAuthenticatedEmail(cleanEmail);
     localStorage.setItem("ank_admin_email", cleanEmail);
   };
