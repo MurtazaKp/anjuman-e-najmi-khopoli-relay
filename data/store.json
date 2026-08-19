@@ -15,8 +15,9 @@
       "longitude": 73.3444,
       "registrationStart": "2026-08-14T20:00:00.000Z",
       "registrationEnd": "2026-09-14T20:00:00.000Z",
-      "status": "REGISTRATION_OPEN",
-      "isCurrent": true
+      "status": "PASSES_ISSUED",
+      "isCurrent": true,
+      "passIssueDate": "2026-08-18T17:35:15.805Z"
     }
   ],
   "families": [
@@ -71,5 +72,30 @@
       ]
     }
   ],
-  "passes": []
+  "passes": [
+    {
+      "id": "pass-mem-fam-1787073506900-455-1",
+      "eventId": "event-urs-1448h",
+      "memberId": "mem-fam-1787073506900-455-1",
+      "qrToken": "KRC-URS-1448H-50499558",
+      "status": "ISSUED",
+      "createdAt": "2026-08-18T17:35:15.805Z"
+    },
+    {
+      "id": "pass-mem-fam-1787073506900-455-2",
+      "eventId": "event-urs-1448h",
+      "memberId": "mem-fam-1787073506900-455-2",
+      "qrToken": "KRC-URS-1448H-20393833",
+      "status": "ISSUED",
+      "createdAt": "2026-08-18T17:35:15.805Z"
+    },
+    {
+      "id": "pass-mem-fam-1787073506900-455-3",
+      "eventId": "event-urs-1448h",
+      "memberId": "mem-fam-1787073506900-455-3",
+      "qrToken": "KRC-URS-1448H-50499560",
+      "status": "ISSUED",
+      "createdAt": "2026-08-18T17:35:15.805Z"
+    }
+  ]
 }

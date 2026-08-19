@@ -37,11 +37,18 @@ export default function EventHomepage() {
 
   const handlePassLookup = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchToken.trim()) return;
+    const cleanToken = searchToken.trim();
+    if (!cleanToken) return;
+
+    if (cleanToken.length !== 8) {
+      setSearchError("ITS ID must be exactly 8 digits.");
+      return;
+    }
+
     setSearching(true);
     setSearchError("");
 
-    window.location.href = `/passes/${searchToken.trim()}`;
+    window.location.href = `/passes/${cleanToken}`;
   };
 
   if (loading) {
@@ -165,16 +172,30 @@ export default function EventHomepage() {
         </div>
 
         <p className="text-xs text-slate-600 font-medium leading-relaxed">
-          Enter your <strong>8-digit ITS ID</strong>, <strong>Mobile Number</strong>, or <strong>Pass Token</strong> to view your family's digital event passes.
+          Enter your <strong>8-digit ITS ID</strong> to view your family's digital event passes.
         </p>
+
+        {searchError && (
+          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs font-bold flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>{searchError}</span>
+          </div>
+        )}
 
         <form onSubmit={handlePassLookup} className="flex flex-col sm:flex-row gap-2.5">
           <input
-            type="text"
-            placeholder="Enter ITS ID, Mobile Number, or Pass Token..."
+            type="number"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="Enter 8-Digit ITS ID..."
             value={searchToken}
-            onChange={(e) => setSearchToken(e.target.value)}
-            className="flex-1 px-4 py-3 rounded-xl border-2 border-navy-900 focus:ring-2 focus:ring-gold-500 focus:outline-none font-bold text-navy-950 bg-cream-50 text-xs sm:text-sm"
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, "").slice(0, 8);
+              setSearchToken(val);
+              if (searchError) setSearchError("");
+            }}
+            maxLength={8}
+            className="flex-1 px-4 py-3 rounded-xl border-2 border-navy-900 focus:ring-2 focus:ring-gold-500 focus:outline-none font-bold text-navy-950 bg-cream-50 text-xs sm:text-sm tracking-wide"
             required
           />
           <button

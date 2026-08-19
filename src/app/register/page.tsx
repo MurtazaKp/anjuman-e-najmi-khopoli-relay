@@ -523,12 +523,13 @@ export default function RegisterPage() {
               <div>
                 <label className="block text-xs font-bold text-navy-900 mb-1">HOF ITS ID (8 Digits) *</label>
                 <input
-                  type="text"
+                  type="number"
+                  inputMode="numeric"
                   placeholder="8-digit ITS ID"
                   value={hofItsId}
                   onChange={(e) => setHofItsId(e.target.value.replace(/\D/g, "").slice(0, 8))}
                   maxLength={8}
-                  pattern="\d{8}"
+                  pattern="[0-9]*"
                   className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white tracking-wide"
                   required
                 />
@@ -876,12 +877,13 @@ export default function RegisterPage() {
               <div>
                 <label className="block text-xs font-bold text-navy-900 mb-1">ITS ID (8 Digits) *</label>
                 <input
-                  type="text"
+                  type="number"
+                  inputMode="numeric"
                   placeholder="8-digit ITS ID"
                   value={memberItsId}
                   onChange={(e) => setMemberItsId(e.target.value.replace(/\D/g, "").slice(0, 8))}
                   maxLength={8}
-                  pattern="\d{8}"
+                  pattern="[0-9]*"
                   className="w-full px-4 py-2 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white tracking-wide"
                   required
                 />
