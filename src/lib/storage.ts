@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { FormattedFamilyGroup, syncToGoogleSheetWebhook } from "./googlesheets";
-import { supabase, isSupabaseConfigured } from "./supabase";
+import { getSupabaseClient, isSupabaseConfigured } from "./supabase";
 
 export interface EventData {
   id: string;
@@ -165,10 +165,16 @@ const getStoreFilePath = (): string => {
   return STORE_FILE;
 };
 
+let g_memoryStore: AppStore | null = null;
+
 /**
- * Load store from JSON file or Vercel environment
+ * Get current AppStore from memory cache or JSON file
  */
 export function getStore(): AppStore {
+  if (g_memoryStore) {
+    return g_memoryStore;
+  }
+
   try {
     const filePath = getStoreFilePath();
     const dirPath = path.dirname(filePath);
@@ -188,18 +194,157 @@ export function getStore(): AppStore {
       } catch (e) {
         // Ignore write error during initial read if read-only
       }
+      g_memoryStore = initialStore;
       return initialStore;
     }
 
     const fileData = fs.readFileSync(filePath, "utf-8");
-    return JSON.parse(fileData) as AppStore;
+    g_memoryStore = JSON.parse(fileData) as AppStore;
+    return g_memoryStore;
   } catch (err) {
     console.error("[Store Error] Failed to read store, fallback to default", err);
-    return {
+    g_memoryStore = {
       events: [DEFAULT_EVENT],
       families: [],
       passes: [],
     };
+    return g_memoryStore;
+  }
+}
+
+/**
+ * Load store directly from Supabase PostgreSQL database
+ */
+export async function loadStoreFromSupabase(): Promise<AppStore | null> {
+  const isConf = isSupabaseConfigured();
+  const client = getSupabaseClient();
+  console.log("[loadStoreFromSupabase Debug]", { isConf, hasClient: Boolean(client) });
+
+  if (!isConf || !client) return null;
+
+  try {
+    const { data: dbEvents, error: evErr } = await client.from("events").select("*");
+    const { data: dbFamilies, error: famErr } = await client.from("families").select("*");
+    const { data: dbMembers, error: memErr } = await client.from("members").select("*");
+    const { data: dbPasses, error: passErr } = await client.from("passes").select("*");
+
+    console.log("[loadStoreFromSupabase Counts]", {
+      dbEventsCount: dbEvents?.length,
+      dbFamiliesCount: dbFamilies?.length,
+      dbMembersCount: dbMembers?.length,
+      dbPassesCount: dbPasses?.length,
+      evErr,
+      famErr,
+      memErr,
+      passErr,
+    });
+
+    if (evErr || famErr || memErr || passErr) {
+      console.error("[Supabase Fetch Error Details]", { evErr, famErr, memErr, passErr });
+    }
+
+    if (!dbEvents || dbEvents.length === 0) return null;
+
+    const events: EventData[] = dbEvents.map((e: any) => ({
+      id: e.id,
+      slug: e.slug,
+      name: e.name,
+      description: e.description,
+      date: e.date,
+      time: e.time,
+      venue: e.venue,
+      location: e.location,
+      mapUrl: e.map_url,
+      parkingMapUrl: e.parking_map_url,
+      latitude: e.latitude,
+      longitude: e.longitude,
+      registrationStart: e.registration_start,
+      registrationEnd: e.registration_end,
+      status: e.status,
+      isCurrent: e.is_current,
+      passIssueDate: e.pass_issue_date,
+    }));
+
+    const membersMap = new Map<string, FamilyMemberData[]>();
+    (dbMembers || []).forEach((m: any) => {
+      const list = membersMap.get(m.family_id) || [];
+      list.push({
+        id: m.id,
+        familyId: m.family_id,
+        eventId: m.event_id,
+        itsId: m.its_id,
+        name: m.name,
+        gender: m.gender,
+        type: m.type,
+        isHof: m.is_hof,
+        createdAt: m.created_at,
+      });
+      membersMap.set(m.family_id, list);
+    });
+
+    const families: FamilyData[] = (dbFamilies || []).map((f: any) => ({
+      id: f.id,
+      eventId: f.event_id,
+      hofName: f.hof_name,
+      hofItsId: f.hof_its_id,
+      mobileNumber: f.mobile_number,
+      mauze: f.mauze,
+      transportMode: f.transport_mode,
+      rajabRozaCount: f.rajab_roza_count,
+      niyazJaman: f.niyaz_jaman,
+      niyazContribution: f.niyaz_contribution,
+      passLinkToken: f.pass_link_token,
+      whatsappStatus: f.whatsapp_status,
+      createdAt: f.created_at,
+      members: membersMap.get(f.id) || [],
+    }));
+
+    const passes: PassData[] = (dbPasses || []).map((p: any) => ({
+      id: p.id,
+      familyId: p.family_id,
+      eventId: p.event_id,
+      memberId: p.member_id,
+      passNumber: p.pass_number,
+      qrToken: p.qr_token,
+      status: p.status,
+      checkedInAt: p.checked_in_at,
+      checkedInBy: p.checked_in_by,
+      createdAt: p.created_at,
+    }));
+
+    const store: AppStore = { events, families, passes };
+    g_memoryStore = store;
+
+    // Save cache locally
+    try {
+      const filePath = getStoreFilePath();
+      const dirPath = path.dirname(filePath);
+      if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
+      fs.writeFileSync(filePath, JSON.stringify(store, null, 2), "utf-8");
+    } catch (e) {}
+
+    return store;
+  } catch (err) {
+    console.error("[Supabase Load Error]", err);
+    return null;
+  }
+}
+
+/**
+ * Clear all families, members, and passes from Supabase PostgreSQL
+ */
+export async function clearSupabaseStore() {
+  if (!isSupabaseConfigured()) return;
+  const client = getSupabaseClient();
+  if (!client) return;
+
+  try {
+    // Delete all records from passes, members, and families
+    await client.from("passes").delete().neq("id", "_none_");
+    await client.from("members").delete().neq("id", "_none_");
+    await client.from("families").delete().neq("id", "_none_");
+  } catch (err) {
+    console.error("[Supabase Clear Error]", err);
   }
 }
 
@@ -207,7 +352,9 @@ export function getStore(): AppStore {
  * Sync store data asynchronously to Supabase PostgreSQL database
  */
 export async function syncStoreToSupabase(store: AppStore) {
-  if (!isSupabaseConfigured || !supabase) return;
+  if (!isSupabaseConfigured()) return;
+  const client = getSupabaseClient();
+  if (!client) return;
 
   try {
     // 1. Sync Events
@@ -231,7 +378,7 @@ export async function syncStoreToSupabase(store: AppStore) {
         is_current: e.isCurrent,
         pass_issue_date: e.passIssueDate,
       }));
-      await supabase.from("events").upsert(eventRows);
+      await client.from("events").upsert(eventRows);
     }
 
     // 2. Sync Families & Members
@@ -251,7 +398,7 @@ export async function syncStoreToSupabase(store: AppStore) {
         whatsapp_status: f.whatsappStatus,
         created_at: f.createdAt,
       }));
-      await supabase.from("families").upsert(familyRows);
+      await client.from("families").upsert(familyRows);
 
       const allMembers = store.families.flatMap((f) => f.members);
       if (allMembers.length > 0) {
@@ -266,25 +413,31 @@ export async function syncStoreToSupabase(store: AppStore) {
           is_hof: m.isHof,
           created_at: m.createdAt,
         }));
-        await supabase.from("members").upsert(memberRows);
+        await client.from("members").upsert(memberRows);
       }
     }
 
     // 3. Sync Passes
     if (store.passes.length > 0) {
-      const passRows = store.passes.map((p) => ({
-        id: p.id,
-        family_id: p.familyId,
-        event_id: p.eventId,
-        member_id: p.memberId,
-        pass_number: p.passNumber,
-        qr_token: p.qrToken,
-        status: p.status,
-        checked_in_at: p.checkedInAt,
-        checked_in_by: p.checkedInBy,
-        created_at: p.createdAt,
-      }));
-      await supabase.from("passes").upsert(passRows);
+      const passRows = store.passes.map((p, idx) => {
+        const matchingFamily = store.families.find((f) => f.members.some((m) => m.id === p.memberId));
+        return {
+          id: p.id,
+          family_id: (p as any).familyId || matchingFamily?.id || null,
+          event_id: p.eventId,
+          member_id: p.memberId,
+          pass_number: (p as any).passNumber || idx + 1,
+          qr_token: p.qrToken,
+          status: p.status,
+          checked_in_at: p.checkedInAt || null,
+          checked_in_by: p.checkedInBy || null,
+          created_at: p.createdAt,
+        };
+      });
+      const { error: passErr } = await client.from("passes").upsert(passRows);
+      if (passErr) {
+        console.error("[Supabase Pass Sync Error]", passErr.message);
+      }
     }
   } catch (err) {
     console.error("[Supabase Sync Error]", err);
@@ -295,6 +448,7 @@ export async function syncStoreToSupabase(store: AppStore) {
  * Save store to JSON file and background sync to Supabase when configured
  */
 export function saveStore(store: AppStore) {
+  g_memoryStore = store;
   try {
     const filePath = getStoreFilePath();
     const dirPath = path.dirname(filePath);
@@ -305,7 +459,7 @@ export function saveStore(store: AppStore) {
 
     fs.writeFileSync(filePath, JSON.stringify(store, null, 2), "utf-8");
 
-    if (isSupabaseConfigured) {
+    if (isSupabaseConfigured()) {
       syncStoreToSupabase(store).catch((e) => console.error("[Supabase Save Error]", e));
     }
   } catch (err) {
@@ -531,11 +685,13 @@ export function generatePassesData(eventId: string) {
           store.passes.push({
             id: `pass-${member.id}`,
             eventId,
+            familyId: family.id,
             memberId: member.id,
+            passNumber: store.passes.length + 1,
             qrToken: `KRC-${event.slug.toUpperCase()}-${member.itsId}`,
             status: "ISSUED",
             createdAt: new Date().toISOString(),
-          });
+          } as any);
           passesCreated++;
         }
       }
@@ -552,12 +708,23 @@ export function generatePassesData(eventId: string) {
 /**
  * Fetch family pass details by Pass Token, HOF ITS ID, Member ITS ID, or Mobile Number
  */
-export function getFamilyPassesData(tokenOrIts: string) {
+export function getFamilyPassesData(tokenOrIts: string, customStore?: AppStore) {
   const clean = tokenOrIts.trim();
   const cleanDigits = clean.replace(/\D/g, "");
-  const store = getStore();
+  const store = customStore || getStore();
 
-  const family = store.families.find(
+  console.log("[Debug Pass Lookup]", {
+    clean,
+    cleanDigits,
+    familiesCount: store.families.length,
+    families: store.families.map((f) => ({
+      hofName: f.hofName,
+      hofItsId: f.hofItsId,
+      memberItsIds: f.members?.map((m) => m.itsId),
+    })),
+  });
+
+  let family = store.families.find(
     (f) =>
       f.passLinkToken === clean ||
       f.hofItsId === clean ||

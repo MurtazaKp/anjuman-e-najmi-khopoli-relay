@@ -134,42 +134,47 @@ export default function PassesPage() {
 
       {/* Conditional Rendering: Pending Registration Confirmation vs Full Issued Passes */}
       {!passesGenerated ? (
-        <div className="bg-white rounded-3xl p-4 sm:p-8 border-2 border-gold-600 shadow-xl text-center space-y-5 sm:space-y-6 w-full">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-cream-100 text-gold-600 rounded-2xl flex items-center justify-center mx-auto shadow-sm border border-gold-400">
-            <Clock className="w-7 h-7 sm:w-8 sm:h-8 text-gold-600" />
+        <div className="bg-white rounded-3xl p-5 sm:p-8 border-2 border-emerald-500 shadow-xl text-center space-y-5 sm:space-y-6 w-full">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto shadow-md border-2 border-emerald-400">
+            <CheckCircle2 className="w-9 h-9 sm:w-11 sm:h-11 text-emerald-600" />
           </div>
 
-          <div className="space-y-1.5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 sm:px-3.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300">
-              🟡 Registration Confirmed
+          <div className="space-y-2">
+            <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-sm">
+              <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+              <span>Registration Confirmed</span>
             </span>
-            <h2 className="text-xl sm:text-3xl font-black text-navy-950 pt-1 leading-snug">
-              Digital Passes Will Be Issued Shortly
+            <h2 className="text-2xl sm:text-3xl font-black text-navy-950 pt-1 leading-tight">
+              Registration Confirmed for {family.hofName}'s Family
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-lg mx-auto">
-              Assalamu Alaikum! Your family registration for <strong>{event?.name || "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H"}</strong> is confirmed. Official digital pass cards and venue details will be unlocked once Jamaat Admin issues passes after registration closes.
+              Assalamu Alaikum! Your family registration for <strong>{event?.name || "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H"}</strong> is <strong>100% Confirmed</strong>. Official digital entry pass cards with QR codes will be unlocked right here once Jamaat Admin issues passes after registration closes.
             </p>
           </div>
 
           {/* Registered Family Members Summary Box */}
-          <div className="p-3.5 sm:p-5 rounded-2xl bg-cream-50 border border-cream-300 text-left space-y-3">
+          <div className="p-4 sm:p-5 rounded-2xl bg-cream-50 border border-cream-300 text-left space-y-3 shadow-inner">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-cream-200 pb-2.5 text-xs font-bold text-navy-950">
-              <span>Registered Family Summary ({family.members.length} Members)</span>
-              <span className="text-slate-600 font-bold font-mono text-[11px] bg-cream-200/80 px-2 py-0.5 rounded-lg border border-cream-300">
+              <span className="text-navy-950 font-black flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>Confirmed Family Members ({family.members.length} Members)</span>
+              </span>
+              <span className="text-navy-950 font-bold font-mono text-[11px] bg-cream-200 px-2.5 py-1 rounded-lg border border-cream-300">
                 HOF ITS: {family.hofItsId}
               </span>
             </div>
 
             <div className="space-y-2">
               {family.members.map((m: any) => (
-                <div key={m.id} className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-1.5 text-xs p-3 rounded-xl bg-white border border-cream-300 shadow-sm">
-                  <div className="flex items-center gap-1.5 min-w-0">
+                <div key={m.id} className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 text-xs p-3 rounded-xl bg-white border border-cream-300 shadow-sm">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                     <span className="font-bold text-navy-950 text-xs sm:text-sm truncate">{m.name}</span>
                     {m.isHof && (
                       <span className="px-1.5 py-0.5 rounded text-[9px] font-black bg-gold-600 text-white shrink-0">HOF</span>
                     )}
                   </div>
-                  <span className="text-slate-600 font-mono font-bold text-[11px] bg-cream-100 px-2 py-0.5 rounded-lg border border-cream-200 shrink-0">
+                  <span className="text-slate-700 font-mono font-bold text-[11px] bg-cream-100 px-2 py-0.5 rounded-lg border border-cream-200 shrink-0">
                     ITS: {m.itsId}
                   </span>
                 </div>

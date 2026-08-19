@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStore, saveStore } from "@/lib/storage";
+import { getStore, saveStore, clearSupabaseStore } from "@/lib/storage";
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +33,11 @@ export async function POST(req: Request) {
     const store = getStore();
     store.families = [];
     store.passes = [];
+    if (store.events.length > 0) {
+      store.events[0].status = "REGISTRATION_OPEN";
+    }
     saveStore(store);
+    await clearSupabaseStore();
 
     return NextResponse.json({
       success: true,
