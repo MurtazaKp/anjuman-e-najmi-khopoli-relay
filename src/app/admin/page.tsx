@@ -157,10 +157,9 @@ export default function AdminPage() {
       const data = await res.json();
       setStatusUpdating(false);
 
-      if (res.ok) {
-        if (data.event) setEvent(data.event);
+      if (res.ok && data.event) {
+        setEvent(data.event);
         setActionMsg(`Event status updated to ${newStatus}`);
-        fetchActiveEvent();
       } else {
         setErrorMsg(data.error || "Failed to update status");
       }
