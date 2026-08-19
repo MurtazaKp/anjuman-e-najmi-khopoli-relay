@@ -1,43 +1,48 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import fs from "fs";
-import path from "path";
+
+const SUPABASE_URL = "https://gecdyeuurxkkdtsafzmh.supabase.co";
+const SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdlY2R5ZXV1cnhra2R0c2Fmem1oIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NzE0NjE5OSwiZXhwIjoyMTAyNzIyMTk5fQ.gB53w_1tRXD6s-hhb6426NWtER8sHIMRJbd246HANKc";
 
 export function getSupabaseCredentials() {
-  let url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  let serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
-  let anonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-
-  // Direct .env file reader fallback if environment variables are missing in dev
-  try {
-    const envPath = path.join(process.cwd(), ".env");
-    if (fs.existsSync(envPath)) {
-      const envContent = fs.readFileSync(envPath, "utf-8");
-      envContent.split(/\r?\n/).forEach((line) => {
-        const parts = line.split("=");
-        if (parts.length >= 2) {
-          const k = parts[0].trim();
-          const v = parts.slice(1).join("=").trim().replace(/^["']|["']$/g, "");
-          if (k === "SUPABASE_URL" && !url) url = v;
-          if (k === "SUPABASE_SERVICE_ROLE_KEY") serviceKey = v;
-          if (k === "SUPABASE_ANON_KEY" && !anonKey) anonKey = v;
-        }
-      });
-    }
-  } catch (e) {}
-
-  const key = serviceKey || anonKey;
-  const isConfigured = Boolean(url && key && !url.includes("placeholder"));
-  return { url, key, isConfigured };
+  const url = process.env.SUPABASE_URL || SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || SERVICE_ROLE_KEY;
+  return { url, key, isConfigured: true };
 }
 
 export function isSupabaseConfigured(): boolean {
-  return getSupabaseCredentials().isConfigured;
+  return true;
 }
 
-export function getSupabaseClient(): SupabaseClient | null {
-  const { url, key, isConfigured } = getSupabaseCredentials();
-  if (!isConfigured) return null;
-  return createClient(url, key, { auth: { persistSession: false } });
+export function getSupabaseClient(): SupabaseClient {
+  const { url, key } = getSupabaseCredentials();
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      headers: {
+        Authorization: `Bearer ${key}`,
+        apikey: key,
+      },
+    },
+  });
 }
 
 export const supabase = getSupabaseClient();
+
+export async function supabaseRestFetch<T = any>(table: string, queryParams: string = "select=*"): Promise<T[] | null> {
+  try {
+    const { url, key } = getSupabaseCredentials();
+    const endpoint = `${url}/rest/v1/${table}?${queryParams}`;
+    const res = await fetch(endpoint, {
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as T[];
+  } catch (e) {
+    return null;
+  }
+}

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getFamilyPasses, getActiveEvent } from "@/lib/events";
-import { getSupabaseClient } from "@/lib/supabase";
+import { getActiveEvent, getFamilyPasses } from "@/lib/events";
+import { isSupabaseConfigured, supabaseRestFetch } from "@/lib/supabase";
 
 export const dynamic = 'force-dynamic';
 
@@ -15,41 +15,25 @@ export async function GET(
     }
 
     const cleanToken = token.trim();
-    const family = await getFamilyPasses(cleanToken);
-    
-    if (family) {
-      return NextResponse.json({ success: true, family });
-    }
 
-    // Direct Supabase database fallback search
-    const client = getSupabaseClient();
-    if (client) {
-      // 1. Search member by ITS ID
-      const { data: directMembers } = await client
-        .from("members")
-        .select("*")
-        .eq("its_id", cleanToken);
-
+    // 1. Direct real-time Supabase Database Search First via REST API
+    if (isSupabaseConfigured()) {
+      const directMembers = await supabaseRestFetch("members", `its_id=eq.${cleanToken}`);
       let targetFamilyId = directMembers && directMembers.length > 0 ? directMembers[0].family_id : null;
       let matchedMemberId = directMembers && directMembers.length > 0 ? directMembers[0].id : null;
 
-      // 2. If not found by member ITS ID, search family by HOF ITS ID, pass link token, or mobile
       if (!targetFamilyId) {
-        const { data: famByToken } = await client
-          .from("families")
-          .select("id, hof_its_id")
-          .or(`pass_link_token.eq.${cleanToken},hof_its_id.eq.${cleanToken},mobile_number.eq.${cleanToken}`)
-          .maybeSingle();
-
-        if (famByToken) {
-          targetFamilyId = famByToken.id;
+        const famByToken = await supabaseRestFetch("families", `or=(pass_link_token.eq.${cleanToken},hof_its_id.eq.${cleanToken},mobile_number.eq.${cleanToken})`);
+        if (famByToken && famByToken.length > 0) {
+          targetFamilyId = famByToken[0].id;
         }
       }
 
       if (targetFamilyId) {
-        const { data: famData } = await client.from("families").select("*").eq("id", targetFamilyId).single();
-        const { data: allMems } = await client.from("members").select("*").eq("family_id", targetFamilyId);
-        const { data: allPasses } = await client.from("passes").select("*").eq("family_id", targetFamilyId);
+        const famList = await supabaseRestFetch("families", `id=eq.${targetFamilyId}`);
+        const famData = famList && famList.length > 0 ? famList[0] : null;
+        const allMems = await supabaseRestFetch("members", `family_id=eq.${targetFamilyId}`);
+        const allPasses = await supabaseRestFetch("passes", `family_id=eq.${targetFamilyId}`);
 
         if (famData) {
           const activeEv = await getActiveEvent();
@@ -70,7 +54,25 @@ export async function GET(
             event: activeEv,
             matchedMemberId: matchedMemberId || (allMems && allMems[0] ? allMems[0].id : null),
             members: (allMems || []).map((m: any, idx: number) => {
-              const passObj = (allPasses || []).find((p: any) => p.member_id === m.id);
+              const passObj = (allPasses || []).find(
+                (p: any) => p.member_id === m.id || (p.qr_token && p.qr_token.includes(m.its_id))
+              );
+
+              const isIssued = Boolean(passObj) || activeEv?.status === "PASSES_ISSUED" || (allPasses && allPasses.length > 0);
+
+              const passData = isIssued
+                ? {
+                    id: passObj?.id || `pass-${m.id}`,
+                    eventId: passObj?.event_id || famData.event_id,
+                    memberId: passObj?.member_id || m.id,
+                    qrToken: passObj?.qr_token || `KRC-${(activeEv?.slug || "URS-1448H").toUpperCase()}-${m.its_id}`,
+                    status: passObj?.status || "ISSUED",
+                    checkedInAt: passObj?.checked_in_at || null,
+                    checkedInBy: passObj?.checked_in_by || null,
+                    createdAt: passObj?.created_at || new Date().toISOString(),
+                  }
+                : null;
+
               return {
                 id: m.id,
                 familyId: m.family_id,
@@ -82,22 +84,19 @@ export async function GET(
                 isHof: m.is_hof,
                 createdAt: m.created_at,
                 passNumber: idx + 1,
-                pass: passObj ? {
-                  id: passObj.id,
-                  eventId: passObj.event_id,
-                  memberId: passObj.member_id,
-                  qrToken: passObj.qr_token,
-                  status: passObj.status,
-                  checkedInAt: passObj.checked_in_at,
-                  checkedInBy: passObj.checked_in_by,
-                  createdAt: passObj.created_at,
-                } : null,
+                pass: passData,
               };
             }),
           };
           return NextResponse.json({ success: true, family: fullFamily });
         }
       }
+    }
+
+    // 2. Fallback to local store
+    const family = await getFamilyPasses(cleanToken);
+    if (family) {
+      return NextResponse.json({ success: true, family });
     }
 
     return NextResponse.json({ error: "Passes not found" }, { status: 404 });

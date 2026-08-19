@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { FormattedFamilyGroup, syncToGoogleSheetWebhook } from "./googlesheets";
-import { getSupabaseClient, isSupabaseConfigured } from "./supabase";
+import { getSupabaseClient, isSupabaseConfigured, getSupabaseCredentials, supabaseRestFetch } from "./supabase";
 
 export interface EventData {
   id: string;
@@ -218,30 +218,15 @@ export function getStore(): AppStore {
 export async function loadStoreFromSupabase(): Promise<AppStore | null> {
   const isConf = isSupabaseConfigured();
   const client = getSupabaseClient();
-  console.log("[loadStoreFromSupabase Debug]", { isConf, hasClient: Boolean(client) });
+  const { url, key } = getSupabaseCredentials();
 
   if (!isConf || !client) return null;
 
   try {
-    const { data: dbEvents, error: evErr } = await client.from("events").select("*");
-    const { data: dbFamilies, error: famErr } = await client.from("families").select("*");
-    const { data: dbMembers, error: memErr } = await client.from("members").select("*");
-    const { data: dbPasses, error: passErr } = await client.from("passes").select("*");
-
-    console.log("[loadStoreFromSupabase Counts]", {
-      dbEventsCount: dbEvents?.length,
-      dbFamiliesCount: dbFamilies?.length,
-      dbMembersCount: dbMembers?.length,
-      dbPassesCount: dbPasses?.length,
-      evErr,
-      famErr,
-      memErr,
-      passErr,
-    });
-
-    if (evErr || famErr || memErr || passErr) {
-      console.error("[Supabase Fetch Error Details]", { evErr, famErr, memErr, passErr });
-    }
+    const dbEvents = await supabaseRestFetch("events");
+    const dbFamilies = await supabaseRestFetch("families");
+    const dbMembers = await supabaseRestFetch("members");
+    const dbPasses = await supabaseRestFetch("passes");
 
     if (!dbEvents || dbEvents.length === 0) return null;
 
@@ -670,10 +655,23 @@ export async function registerFamilyData(
 /**
  * Generate passes for all members of an event
  */
-export function generatePassesData(eventId: string) {
-  const store = getStore();
+export function generatePassesData(eventId: string, customStore?: AppStore) {
+  const store = customStore || getStore();
   const event = store.events.find((e) => e.id === eventId);
   if (!event) throw new Error("Event not found");
+
+  console.log("[generatePassesData Debug]", {
+    eventId,
+    eventFoundId: event.id,
+    familiesCount: store.families.length,
+    passesCount: store.passes.length,
+    families: store.families.map((f) => ({
+      id: f.id,
+      eventId: f.eventId,
+      membersCount: f.members.length,
+      members: f.members.map((m) => ({ id: m.id, itsId: m.itsId })),
+    })),
+  });
 
   let passesCreated = 0;
 
@@ -755,7 +753,13 @@ export function getFamilyPassesData(tokenOrIts: string, customStore?: AppStore) 
   });
 
   const membersWithPasses = family.members.map((m) => {
-    const pass = store.passes.find((p) => p.memberId === m.id);
+    const pass = store.passes.find(
+      (p) =>
+        p.memberId === m.id ||
+        (p as any).member_id === m.id ||
+        (p as any).memberId === m.id ||
+        p.qrToken?.includes(m.itsId)
+    );
     const passNumber = passNumberMap.get(m.id) || 1;
     return {
       ...m,

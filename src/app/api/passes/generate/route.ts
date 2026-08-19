@@ -10,18 +10,13 @@ export async function POST() {
       return NextResponse.json({ error: "No active event" }, { status: 404 });
     }
 
-    if (event.status === "REGISTRATION_OPEN") {
-      return NextResponse.json(
-        { error: "Registration is currently OPEN. You must close registration first before generating passes." },
-        { status: 400 }
-      );
-    }
-
     const result = await generatePassesForEvent(event.id);
 
     return NextResponse.json({
       success: true,
-      message: `Generated digital passes for ${result.passesCreated} family members!`,
+      message: result.passesCreated > 0 
+        ? `Issued digital passes for ${result.passesCreated} new family members!` 
+        : `All registered family members already have digital passes issued.`,
       result,
     });
   } catch (error: any) {

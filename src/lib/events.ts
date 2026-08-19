@@ -44,8 +44,8 @@ export async function registerFamily(eventId: string, input: RegisterFamilyInput
 }
 
 export async function generatePassesForEvent(eventId: string) {
-  await loadStoreFromSupabase();
-  const res = generatePassesData(eventId);
+  const store = await loadStoreFromSupabase();
+  const res = generatePassesData(eventId, store || undefined);
   await syncStoreToSupabase(getStore());
   return res;
 }
@@ -72,5 +72,6 @@ export async function updateEventStatus(eventId: string, status: any) {
   if (!event) throw new Error("Event not found");
   event.status = status;
   saveStore(store);
+  await syncStoreToSupabase(store);
   return event;
 }

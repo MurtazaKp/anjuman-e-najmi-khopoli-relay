@@ -144,6 +144,7 @@ export default function AdminPage() {
 
   const handleUpdateStatus = async (newStatus: string) => {
     if (!event) return;
+    setEvent((prev: any) => (prev ? { ...prev, status: newStatus } : prev));
     setStatusUpdating(true);
     setActionMsg("");
     setErrorMsg("");
@@ -162,14 +163,19 @@ export default function AdminPage() {
         setActionMsg(`Event status updated to ${newStatus}`);
       } else {
         setErrorMsg(data.error || "Failed to update status");
+        fetchActiveEvent();
       }
     } catch (err: any) {
       setStatusUpdating(false);
       setErrorMsg(err.message || "Failed to update status");
+      fetchActiveEvent();
     }
   };
 
   const handleGeneratePasses = async () => {
+    if (event) {
+      setEvent((prev: any) => (prev ? { ...prev, status: "PASSES_ISSUED" } : prev));
+    }
     setGeneratingPasses(true);
     setActionMsg("");
     setErrorMsg("");
@@ -184,10 +190,12 @@ export default function AdminPage() {
         fetchActiveEvent();
       } else {
         setErrorMsg(data.error || "Failed to generate passes");
+        fetchActiveEvent();
       }
     } catch (err: any) {
       setGeneratingPasses(false);
       setErrorMsg(err.message);
+      fetchActiveEvent();
     }
   };
 

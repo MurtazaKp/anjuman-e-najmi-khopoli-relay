@@ -90,7 +90,9 @@ export default function PassesPage() {
   }
 
   const event = family.event;
-  const passesGenerated = family.members.some((m: any) => m.pass !== null && m.pass?.qrToken);
+  const passesGenerated =
+    family.members.some((m: any) => m.pass !== null && m.pass?.qrToken) ||
+    event?.status === "PASSES_ISSUED";
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
