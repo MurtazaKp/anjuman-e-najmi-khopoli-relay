@@ -333,11 +333,6 @@ export default function PassesPage() {
           </div>
         </div>
       )}
-
-      {/* Niyaz e Hussain Payment QR & Copyable UPI ID Card */}
-      <div className="pt-4">
-        <DigitalQrCard size="large" />
-      </div>
     </div>
   );
 }
