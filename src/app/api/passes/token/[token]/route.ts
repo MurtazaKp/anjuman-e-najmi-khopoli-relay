@@ -37,6 +37,14 @@ export async function GET(
 
         if (famData) {
           const activeEv = await getActiveEvent();
+
+          // Fetch all event members in order of registration to assign continuous global token numbers (1, 2, 3... 4, 5, 6... etc)
+          const eventMems = await supabaseRestFetch("members", `event_id=eq.${famData.event_id}&order=created_at.asc`);
+          const globalPassNumberMap = new Map<string, number>();
+          (eventMems || []).forEach((m: any, idx: number) => {
+            globalPassNumberMap.set(m.id, idx + 1);
+          });
+
           const fullFamily = {
             id: famData.id,
             eventId: famData.event_id,
@@ -60,11 +68,14 @@ export async function GET(
 
               const isIssued = Boolean(passObj) || activeEv?.status === "PASSES_ISSUED" || (allPasses && allPasses.length > 0);
 
+              const calculatedPassNumber = passObj?.pass_number || globalPassNumberMap.get(m.id) || (idx + 1);
+
               const passData = isIssued
                 ? {
                     id: passObj?.id || `pass-${m.id}`,
                     eventId: passObj?.event_id || famData.event_id,
                     memberId: passObj?.member_id || m.id,
+                    passNumber: calculatedPassNumber,
                     qrToken: passObj?.qr_token || `KRC-${(activeEv?.slug || "URS-1448H").toUpperCase()}-${m.its_id}`,
                     status: passObj?.status || "ISSUED",
                     checkedInAt: passObj?.checked_in_at || null,
@@ -83,7 +94,7 @@ export async function GET(
                 type: m.type,
                 isHof: m.is_hof,
                 createdAt: m.created_at,
-                passNumber: idx + 1,
+                passNumber: calculatedPassNumber,
                 pass: passData,
               };
             }),

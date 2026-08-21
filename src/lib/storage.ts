@@ -675,9 +675,25 @@ export function generatePassesData(eventId: string, customStore?: AppStore) {
 
   let passesCreated = 0;
 
+  // Compute global sequential member order across all families for continuous token numbers
+  const allMembersOrdered: FamilyMemberData[] = [];
   for (const family of store.families) {
     if (family.eventId === eventId) {
       for (const member of family.members) {
+        allMembersOrdered.push(member);
+      }
+    }
+  }
+
+  const memberPassNumMap = new Map<string, number>();
+  allMembersOrdered.forEach((m, idx) => {
+    memberPassNumMap.set(m.id, idx + 1);
+  });
+
+  for (const family of store.families) {
+    if (family.eventId === eventId) {
+      for (const member of family.members) {
+        const passNum = memberPassNumMap.get(member.id) || 1;
         const existingPass = store.passes.find((p) => p.memberId === member.id);
         if (!existingPass) {
           store.passes.push({
@@ -685,12 +701,14 @@ export function generatePassesData(eventId: string, customStore?: AppStore) {
             eventId,
             familyId: family.id,
             memberId: member.id,
-            passNumber: store.passes.length + 1,
+            passNumber: passNum,
             qrToken: `KRC-${event.slug.toUpperCase()}-${member.itsId}`,
             status: "ISSUED",
             createdAt: new Date().toISOString(),
           } as any);
           passesCreated++;
+        } else {
+          (existingPass as any).passNumber = passNum;
         }
       }
     }
