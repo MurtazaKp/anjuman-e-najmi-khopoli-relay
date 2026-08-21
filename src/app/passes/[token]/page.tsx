@@ -20,6 +20,7 @@ import {
   Sparkles
 } from "lucide-react";
 import ScreenshotGuard from "@/components/ScreenshotGuard";
+import DigitalQrCard from "@/components/DigitalQrCard";
 
 export default function PassesPage() {
   const params = useParams();
@@ -332,6 +333,11 @@ export default function PassesPage() {
           </div>
         </div>
       )}
+
+      {/* Niyaz e Hussain Payment QR & Copyable UPI ID Card */}
+      <div className="pt-4">
+        <DigitalQrCard size="large" />
+      </div>
     </div>
   );
 }
