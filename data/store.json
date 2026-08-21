@@ -15,11 +15,178 @@
       "longitude": 73.3444,
       "registrationStart": "2026-08-14T20:00:00+00:00",
       "registrationEnd": "2026-09-14T20:00:00+00:00",
-      "status": "REGISTRATION_CLOSED",
+      "status": "REGISTRATION_OPEN",
       "isCurrent": true,
-      "passIssueDate": "2026-08-21T16:28:16.898+00:00"
+      "passIssueDate": "2026-08-21T17:02:04.053+00:00"
     }
   ],
-  "families": [],
-  "passes": []
+  "families": [
+    {
+      "id": "fam-1787331481947-188",
+      "eventId": "event-urs-1448h",
+      "hofName": "Murtaza Khopoliwala",
+      "hofItsId": "50499558",
+      "mobileNumber": "9403825153",
+      "mauze": "Lonavala",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "Yes, Jami ne Jaisu",
+      "niyazContribution": "7200",
+      "passLinkToken": "pass-1787331481947-z94lrm",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-08-21T16:58:01.947+00:00",
+      "members": [
+        {
+          "id": "mem-fam-1787331481947-188-1",
+          "familyId": "fam-1787331481947-188",
+          "eventId": "event-urs-1448h",
+          "itsId": "50499558",
+          "name": "Murtaza Khopoliwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-08-21T16:58:01.947+00:00"
+        },
+        {
+          "id": "mem-fam-1787331481947-188-2",
+          "familyId": "fam-1787331481947-188",
+          "eventId": "event-urs-1448h",
+          "itsId": "50499557",
+          "name": "Taher Khopoliwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": false,
+          "createdAt": "2026-08-21T16:58:01.947+00:00"
+        }
+      ]
+    },
+    {
+      "id": "fam-1787331637634-77",
+      "eventId": "event-urs-1448h",
+      "hofName": "Aliasgar Khopoliwala",
+      "hofItsId": "20393833",
+      "mobileNumber": "9878979879",
+      "mauze": "Lonavala",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "No, Not Possible",
+      "niyazContribution": "Je Imkaan Thase",
+      "passLinkToken": "pass-1787331637634-lrj2i2",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-08-21T17:00:37.634+00:00",
+      "members": [
+        {
+          "id": "mem-fam-1787331637634-77-1",
+          "familyId": "fam-1787331637634-77",
+          "eventId": "event-urs-1448h",
+          "itsId": "20393833",
+          "name": "Aliasgar Khopoliwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-08-21T17:00:37.634+00:00"
+        },
+        {
+          "id": "mem-fam-1787331637634-77-2",
+          "familyId": "fam-1787331637634-77",
+          "eventId": "event-urs-1448h",
+          "itsId": "50499560",
+          "name": "Tasneem Khopoliwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": false,
+          "createdAt": "2026-08-21T17:00:37.634+00:00"
+        }
+      ]
+    },
+    {
+      "id": "fam-1787331922642-970",
+      "eventId": "event-urs-1448h",
+      "hofName": "Murtaza Khopoliwala",
+      "hofItsId": "50499513",
+      "mobileNumber": "9403825153",
+      "mauze": "Lonavala",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "Yes, Jami ne Jaisu",
+      "niyazContribution": "7200",
+      "passLinkToken": "pass-1787331922642-koohc8",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-08-21T17:05:22.642Z",
+      "members": [
+        {
+          "id": "mem-fam-1787331922642-970-1",
+          "familyId": "fam-1787331922642-970",
+          "eventId": "event-urs-1448h",
+          "itsId": "50499513",
+          "name": "Murtaza Khopoliwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-08-21T17:05:22.642Z"
+        },
+        {
+          "id": "mem-fam-1787331922642-970-2",
+          "familyId": "fam-1787331922642-970",
+          "eventId": "event-urs-1448h",
+          "itsId": "50499555",
+          "name": "Taher Khopoliwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": false,
+          "createdAt": "2026-08-21T17:05:22.642Z"
+        }
+      ]
+    }
+  ],
+  "passes": [
+    {
+      "id": "pass-mem-fam-1787331481947-188-1",
+      "familyId": "fam-1787331481947-188",
+      "eventId": "event-urs-1448h",
+      "memberId": "mem-fam-1787331481947-188-1",
+      "passNumber": 1,
+      "qrToken": "KRC-URS-1448H-50499558",
+      "status": "ISSUED",
+      "checkedInAt": null,
+      "checkedInBy": null,
+      "createdAt": "2026-08-21T16:58:51.032+00:00"
+    },
+    {
+      "id": "pass-mem-fam-1787331481947-188-2",
+      "familyId": "fam-1787331481947-188",
+      "eventId": "event-urs-1448h",
+      "memberId": "mem-fam-1787331481947-188-2",
+      "passNumber": 2,
+      "qrToken": "KRC-URS-1448H-50499557",
+      "status": "ISSUED",
+      "checkedInAt": null,
+      "checkedInBy": null,
+      "createdAt": "2026-08-21T16:58:51.032+00:00"
+    },
+    {
+      "id": "pass-mem-fam-1787331637634-77-1",
+      "familyId": "fam-1787331637634-77",
+      "eventId": "event-urs-1448h",
+      "memberId": "mem-fam-1787331637634-77-1",
+      "passNumber": 3,
+      "qrToken": "KRC-URS-1448H-20393833",
+      "status": "ISSUED",
+      "checkedInAt": null,
+      "checkedInBy": null,
+      "createdAt": "2026-08-21T17:02:04.053+00:00"
+    },
+    {
+      "id": "pass-mem-fam-1787331637634-77-2",
+      "familyId": "fam-1787331637634-77",
+      "eventId": "event-urs-1448h",
+      "memberId": "mem-fam-1787331637634-77-2",
+      "passNumber": 4,
+      "qrToken": "KRC-URS-1448H-50499560",
+      "status": "ISSUED",
+      "checkedInAt": null,
+      "checkedInBy": null,
+      "createdAt": "2026-08-21T17:02:04.053+00:00"
+    }
+  ]
 }

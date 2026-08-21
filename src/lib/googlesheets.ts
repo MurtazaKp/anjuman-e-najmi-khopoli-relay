@@ -28,19 +28,27 @@ export function buildFormattedSheetRows(eventName: string, familyGroups: Formatt
   rows.push([]);
 
   rows.push([
-    "ITS ID",
+    "ITS",
     "Name",
     "Status",
     "Gender",
-    "Mobile Number",
+    "Phone No",
     "Mauze",
-    "Transportation",
-    "Niyaz Jaman",
+    "Mode of Transportation",
+    "Will Have Niyaz",
     "Niyaz Contribution"
   ]);
 
-  familyGroups.forEach((family, index) => {
+  const seenItsSet = new Set<string>();
+
+  familyGroups.forEach((family) => {
     family.members.forEach((member, memberIdx) => {
+      const cleanIts = String(member.itsId).trim();
+      if (cleanIts && seenItsSet.has(cleanIts)) {
+        return;
+      }
+      if (cleanIts) seenItsSet.add(cleanIts);
+
       let contribVal: any = memberIdx === 0 ? family.niyazContribution || "—" : "—";
       if (contribVal !== "—" && contribVal !== "Je Imkaan Thase") {
         const num = Number(String(contribVal).replace(/,/g, "").trim());
@@ -63,10 +71,6 @@ export function buildFormattedSheetRows(eventName: string, familyGroups: Formatt
         contribVal
       ]);
     });
-
-    if (index < familyGroups.length - 1) {
-      rows.push([]);
-    }
   });
 
   return rows;

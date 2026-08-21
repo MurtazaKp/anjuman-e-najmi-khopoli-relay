@@ -400,14 +400,6 @@ export default function AdminPage() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
-          <button
-            onClick={handleSyncGoogleSheet}
-            disabled={syncingSheet}
-            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 border border-gold-400"
-          >
-            <RefreshCw className={`w-4 h-4 ${syncingSheet ? "animate-spin" : ""}`} />
-            <span>{syncingSheet ? "Syncing..." : "Sync All Data to Google Sheet"}</span>
-          </button>
 
           <a
             href="https://docs.google.com/spreadsheets/d/1xp75B9scBNHy1BobMFhgUwaV41JV39IUnKyz8W-Wwts"

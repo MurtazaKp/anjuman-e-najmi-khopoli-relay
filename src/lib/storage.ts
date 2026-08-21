@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { FormattedFamilyGroup, syncToGoogleSheetWebhook } from "./googlesheets";
+import { FormattedFamilyGroup, syncToGoogleSheetWebhook, syncFullStoreToGoogleSheet } from "./googlesheets";
 import { getSupabaseClient, isSupabaseConfigured, getSupabaseCredentials, supabaseRestFetch } from "./supabase";
 
 export interface EventData {
@@ -643,7 +643,7 @@ export async function registerFamilyData(
     })),
   };
 
-  // Fire-and-forget background sync to Google Sheets (non-blocking for instant sub-second response)
+  // Fire-and-forget background sync to Google Sheets
   syncToGoogleSheetWebhook({
     eventName: event.name,
     family: formattedGroup,
