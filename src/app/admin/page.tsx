@@ -396,7 +396,7 @@ export default function AdminPage() {
         </div>
 
         <p className="text-xs text-slate-600 leading-relaxed font-medium">
-          Exports registration records in the exact Khopoli Relay Centre format: Single-sheet layout with main event heading, family grouping, blank row separators, and columns (ITS ID, Name, Status, Gender, Type, Mobile Number).
+          Exports registration records in the exact Khopoli Relay Centre format: Single-sheet layout with main event heading, family grouping, blank row separators, and columns (ITS ID, Name, Status, Gender, Mobile Number, Mauze, Transportation, Niyaz Jaman, Niyaz Contribution).
         </p>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">

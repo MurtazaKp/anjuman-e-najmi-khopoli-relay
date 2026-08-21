@@ -221,7 +221,7 @@ export default function StaffCheckinPage() {
                   {scanResult.member?.name}
                 </h2>
                 <p className="text-xs text-slate-600 font-medium mt-1">
-                  ITS ID: <strong>{scanResult.member?.itsId}</strong> · {scanResult.member?.gender} · {scanResult.member?.type}
+                  ITS ID: <strong>{scanResult.member?.itsId}</strong> · {scanResult.member?.type === "Child" ? "Gair Baligh" : `${scanResult.member?.gender} Adult`}
                 </p>
                 <p className="text-xs text-slate-500 mt-0.5">
                   Family: <strong>{scanResult.member?.family?.hofName}</strong>

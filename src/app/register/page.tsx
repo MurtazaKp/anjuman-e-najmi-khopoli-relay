@@ -32,7 +32,14 @@ interface Member {
   name: string;
   gender: "Male" | "Female";
   type: "Adult" | "Child";
+  genderType: string;
 }
+
+const parseGenderType = (val: string): { gender: "Male" | "Female"; type: "Adult" | "Child" } => {
+  if (val === "Female Adult") return { gender: "Female", type: "Adult" };
+  if (val === "Gair Baligh") return { gender: "Male", type: "Child" };
+  return { gender: "Male", type: "Adult" };
+};
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -65,8 +72,7 @@ export default function RegisterPage() {
   const [hofName, setHofName] = useState("");
   const [hofItsId, setHofItsId] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
-  const [hofGender, setHofGender] = useState<"Male" | "Female">("Male");
-  const [hofType, setHofType] = useState<"Adult" | "Child">("Adult");
+  const [hofGenderType, setHofGenderType] = useState<string>("Male Adult");
 
   // Niyaz & Contribution State
   const [niyazJaman, setNiyazJaman] = useState("Yes, Jami ne Jaisu");
@@ -80,8 +86,7 @@ export default function RegisterPage() {
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
   const [memberName, setMemberName] = useState("");
   const [memberItsId, setMemberItsId] = useState("");
-  const [memberGender, setMemberGender] = useState<"Male" | "Female">("Male");
-  const [memberType, setMemberType] = useState<"Adult" | "Child">("Adult");
+  const [memberGenderType, setMemberGenderType] = useState<string>("Male Adult");
 
   // Validation & Loading States
   const [itsChecking, setItsChecking] = useState(false);
@@ -159,8 +164,7 @@ export default function RegisterPage() {
     setEditingMemberId(null);
     setMemberName("");
     setMemberItsId("");
-    setMemberGender("Male");
-    setMemberType("Adult");
+    setMemberGenderType("Male Adult");
     setErrorMsg("");
     setModalErrorMsg("");
     setShowMemberModal(true);
@@ -170,8 +174,8 @@ export default function RegisterPage() {
     setEditingMemberId(member.id);
     setMemberName(member.name);
     setMemberItsId(member.itsId);
-    setMemberGender(member.gender);
-    setMemberType(member.type);
+    const gType = member.genderType || (member.type === "Child" ? "Gair Baligh" : `${member.gender} Adult`);
+    setMemberGenderType(gType);
     setErrorMsg("");
     setModalErrorMsg("");
     setShowMemberModal(true);
@@ -210,11 +214,13 @@ export default function RegisterPage() {
     const isBackendValid = await verifyItsIdBackend(cleanIts, setModalErrorMsg);
     if (!isBackendValid) return;
 
+    const parsed = parseGenderType(memberGenderType);
+
     if (editingMemberId) {
       setMembers(
         members.map((m) =>
           m.id === editingMemberId
-            ? { ...m, name: memberName.trim(), itsId: cleanIts, gender: memberGender, type: memberType }
+            ? { ...m, name: memberName.trim(), itsId: cleanIts, gender: parsed.gender, type: parsed.type, genderType: memberGenderType }
             : m
         )
       );
@@ -225,8 +231,9 @@ export default function RegisterPage() {
           id: `temp-${Date.now()}-${Math.random()}`,
           name: memberName.trim(),
           itsId: cleanIts,
-          gender: memberGender,
-          type: memberType,
+          gender: parsed.gender,
+          type: parsed.type,
+          genderType: memberGenderType,
         },
       ]);
     }
@@ -245,6 +252,7 @@ export default function RegisterPage() {
 
     const finalMauze = mauze === "Other" ? mauzeOther.trim() : mauze;
     const finalTransport = transportMode === "Other" ? transportOther.trim() : transportMode;
+    const parsedHof = parseGenderType(hofGenderType);
 
     try {
       const res = await fetch("/api/register", {
@@ -254,18 +262,21 @@ export default function RegisterPage() {
           hofName,
           hofItsId,
           mobileNumber,
-          hofGender,
-          hofType,
+          hofGender: parsedHof.gender,
+          hofType: parsedHof.type,
           mauze: finalMauze,
           transportMode: finalTransport,
           niyazJaman,
           niyazContribution,
-          familyMembers: members.map((m) => ({
-            itsId: m.itsId,
-            name: m.name,
-            gender: m.gender,
-            type: m.type,
-          })),
+          familyMembers: members.map((m) => {
+            const parsed = parseGenderType(m.genderType || (m.type === "Child" ? "Gair Baligh" : `${m.gender} Adult`));
+            return {
+              itsId: m.itsId,
+              name: m.name,
+              gender: parsed.gender,
+              type: parsed.type,
+            };
+          }),
         }),
       });
 
@@ -453,126 +464,116 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-4 text-sm">
-            {/* Mauze Selection */}
+            {/* 1. HOF ITS ID */}
             <div>
-              <label className="block text-xs font-bold text-navy-900 mb-1 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-gold-600" />
-                <span>Your Mauze *</span>
-              </label>
-              <select
-                value={mauze}
-                onChange={(e) => setMauze(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-bold text-navy-950 bg-white"
-              >
-                <option value="Lonavala">Lonavala</option>
-                <option value="Pune">Pune</option>
-                <option value="Other">Other (Please specify below)</option>
-              </select>
-              {mauze === "Other" && (
-                <input
-                  type="text"
-                  placeholder="Specify your Mauze name..."
-                  value={mauzeOther}
-                  onChange={(e) => setMauzeOther(e.target.value)}
-                  className="w-full mt-2 px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 font-semibold text-navy-950 bg-white"
-                  required
-                />
-              )}
+              <label className="block text-xs font-bold text-navy-900 mb-1">1. HOF ITS ID (8 Digits) *</label>
+              <input
+                type="number"
+                inputMode="numeric"
+                placeholder="8-digit ITS ID"
+                value={hofItsId}
+                onChange={(e) => setHofItsId(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                maxLength={8}
+                pattern="[0-9]*"
+                className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white tracking-wide"
+                required
+              />
             </div>
 
-            {/* Mode of Transportation */}
+            {/* 2. HOF Full Name */}
             <div>
-              <label className="block text-xs font-bold text-navy-900 mb-1 flex items-center gap-1">
-                <Car className="w-3.5 h-3.5 text-gold-600" />
-                <span>Mode of Transportation (For Parking Arrangements) *</span>
-              </label>
-              <select
-                value={transportMode}
-                onChange={(e) => setTransportMode(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-bold text-navy-950 bg-white"
-              >
-                <option value="Car">Car</option>
-                <option value="Bus">Bus</option>
-                <option value="Other">Other (Specify)</option>
-              </select>
-              {transportMode === "Other" && (
-                <input
-                  type="text"
-                  placeholder="Specify transportation mode..."
-                  value={transportOther}
-                  onChange={(e) => setTransportOther(e.target.value)}
-                  className="w-full mt-2 px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 font-semibold text-navy-950 bg-white"
-                  required
-                />
-              )}
+              <label className="block text-xs font-bold text-navy-900 mb-1">2. HOF Full Name *</label>
+              <input
+                type="text"
+                placeholder="e.g. Murtaza Khopoliwala"
+                value={hofName}
+                onChange={(e) => setHofName(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white"
+                required
+              />
             </div>
 
-            <div className="border-t border-cream-200 pt-3 space-y-3">
+            {/* 3. Mobile Number */}
+            <div>
+              <label className="block text-xs font-bold text-navy-900 mb-1">3. Mobile Number (10 Digits) *</label>
+              <input
+                type="tel"
+                placeholder="10-digit mobile number"
+                value={mobileNumber}
+                onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                maxLength={10}
+                pattern="\d{10}"
+                className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white"
+                required
+              />
+            </div>
+
+            {/* 4. Gender */}
+            <div>
+              <label className="block text-xs font-bold text-navy-900 mb-1">4. Gender *</label>
+              <select
+                value={hofGenderType}
+                onChange={(e) => setHofGenderType(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-bold text-navy-950 bg-white"
+              >
+                <option value="Male Adult">Male Adult</option>
+                <option value="Female Adult">Female Adult</option>
+              </select>
+            </div>
+
+            <div className="border-t border-cream-200 pt-3 space-y-4">
+              {/* 5. Mauze Selection */}
               <div>
-                <label className="block text-xs font-bold text-navy-900 mb-1">HOF Full Name *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Murtaza Khopoliwala"
-                  value={hofName}
-                  onChange={(e) => setHofName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white"
-                  required
-                />
+                <label className="block text-xs font-bold text-navy-900 mb-1 flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-gold-600" />
+                  <span>5. Your Mauze *</span>
+                </label>
+                <select
+                  value={mauze}
+                  onChange={(e) => setMauze(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-bold text-navy-950 bg-white"
+                >
+                  <option value="Lonavala">Lonavala</option>
+                  <option value="Pune">Pune</option>
+                  <option value="Other">Other (Please specify below)</option>
+                </select>
+                {mauze === "Other" && (
+                  <input
+                    type="text"
+                    placeholder="Specify your Mauze name..."
+                    value={mauzeOther}
+                    onChange={(e) => setMauzeOther(e.target.value)}
+                    className="w-full mt-2 px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 font-semibold text-navy-950 bg-white"
+                    required
+                  />
+                )}
               </div>
 
+              {/* 6. Mode of Transportation */}
               <div>
-                <label className="block text-xs font-bold text-navy-900 mb-1">HOF ITS ID (8 Digits) *</label>
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  placeholder="8-digit ITS ID"
-                  value={hofItsId}
-                  onChange={(e) => setHofItsId(e.target.value.replace(/\D/g, "").slice(0, 8))}
-                  maxLength={8}
-                  pattern="[0-9]*"
-                  className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white tracking-wide"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-navy-900 mb-1">Mobile Number (10 Digits) *</label>
-                <input
-                  type="tel"
-                  placeholder="10-digit mobile number"
-                  value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                  maxLength={10}
-                  pattern="\d{10}"
-                  className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 pt-1">
-                <div>
-                  <label className="block text-xs font-bold text-navy-900 mb-1">Gender</label>
-                  <select
-                    value={hofGender}
-                    onChange={(e) => setHofGender(e.target.value as "Male" | "Female")}
-                    className="w-full px-3 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-bold text-navy-950 bg-white"
-                  >
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-navy-900 mb-1">Type</label>
-                  <select
-                    value={hofType}
-                    onChange={(e) => setHofType(e.target.value as "Adult" | "Child")}
-                    className="w-full px-3 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-bold text-navy-950 bg-white"
-                  >
-                    <option value="Adult">Adult</option>
-                    <option value="Child">Child (Gair Baligh)</option>
-                  </select>
-                </div>
+                <label className="block text-xs font-bold text-navy-900 mb-1 flex items-center gap-1">
+                  <Car className="w-3.5 h-3.5 text-gold-600" />
+                  <span>6. Mode of Transportation (For Parking Arrangements) *</span>
+                </label>
+                <select
+                  value={transportMode}
+                  onChange={(e) => setTransportMode(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-bold text-navy-950 bg-white"
+                >
+                  <option value="Car">Car</option>
+                  <option value="Bus">Bus</option>
+                  <option value="Other">Other (Specify)</option>
+                </select>
+                {transportMode === "Other" && (
+                  <input
+                    type="text"
+                    placeholder="Specify transportation mode..."
+                    value={transportOther}
+                    onChange={(e) => setTransportOther(e.target.value)}
+                    className="w-full mt-2 px-4 py-2.5 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 font-semibold text-navy-950 bg-white"
+                    required
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -627,7 +628,7 @@ export default function RegisterPage() {
                     </span>
                   </div>
                   <p className="text-xs text-slate-600 mt-0.5 font-medium">
-                    ITS: {hofItsId} · {hofGender} · {hofType}
+                    ITS: {hofItsId} · {hofGenderType}
                   </p>
                 </div>
               </div>
@@ -650,7 +651,7 @@ export default function RegisterPage() {
                         </span>
                       </div>
                       <p className="text-xs text-slate-600 font-medium mt-0.5">
-                        ITS: {member.itsId} · {member.gender} · {member.type}
+                        ITS: {member.itsId} · {member.genderType || (member.type === "Child" ? "Gair Baligh" : `${member.gender} Adult`)}
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
@@ -687,10 +688,10 @@ export default function RegisterPage() {
             <button
               type="button"
               onClick={() => setStep(3)}
-              className="flex-1 py-3 rounded-xl bg-navy-900 hover:bg-navy-800 text-white font-bold text-sm transition shadow-md flex items-center justify-center gap-1 border border-navy-800"
+              className="flex-1 py-3 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-black text-sm transition shadow-md flex items-center justify-center gap-2 border border-gold-400/40"
             >
-              <span>Continue to Niyaz & Review</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Continue to Niyaz & Review ({members.length + 1} Members)</span>
+              <ArrowRight className="w-4 h-4 text-white" />
             </button>
           </div>
         </div>
@@ -790,7 +791,7 @@ export default function RegisterPage() {
                 <div>
                   <p className="font-bold text-navy-950 text-sm">{hofName}</p>
                   <p className="text-xs text-slate-600 mt-0.5 font-medium">
-                    <span className="font-bold text-gold-600">HOF</span> · ITS: {hofItsId} · {hofGender} · {hofType}
+                    <span className="font-bold text-gold-600">HOF</span> · ITS: {hofItsId} · {hofGenderType}
                   </p>
                 </div>
               </div>
@@ -800,7 +801,7 @@ export default function RegisterPage() {
                   <div>
                     <p className="font-semibold text-navy-950 text-sm">{m.name}</p>
                     <p className="text-xs text-slate-600 mt-0.5 font-medium">
-                      Family Member · ITS: {m.itsId} · {m.gender} · {m.type}
+                      Family Member · ITS: {m.itsId} · {m.genderType || (m.type === "Child" ? "Gair Baligh" : `${m.gender} Adult`)}
                     </p>
                   </div>
                   <div className="flex items-center gap-1">
@@ -863,19 +864,7 @@ export default function RegisterPage() {
                 </div>
               )}
               <div>
-                <label className="block text-xs font-bold text-navy-900 mb-1">Member Name *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Fatema Khopoliwala"
-                  value={memberName}
-                  onChange={(e) => setMemberName(e.target.value)}
-                  className="w-full px-4 py-2 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-navy-900 mb-1">ITS ID (8 Digits) *</label>
+                <label className="block text-xs font-bold text-navy-900 mb-1">1. Member ITS ID (8 Digits) *</label>
                 <input
                   type="number"
                   inputMode="numeric"
@@ -889,30 +878,29 @@ export default function RegisterPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-navy-900 mb-1">Gender</label>
-                  <select
-                    value={memberGender}
-                    onChange={(e) => setMemberGender(e.target.value as "Male" | "Female")}
-                    className="w-full px-3 py-2 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none bg-white font-bold text-navy-950"
-                  >
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-xs font-bold text-navy-900 mb-1">2. Member Name *</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Fatema Khopoliwala"
+                  value={memberName}
+                  onChange={(e) => setMemberName(e.target.value)}
+                  className="w-full px-4 py-2 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none font-semibold text-navy-950 bg-white"
+                  required
+                />
+              </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-navy-900 mb-1">Type</label>
-                  <select
-                    value={memberType}
-                    onChange={(e) => setMemberType(e.target.value as "Adult" | "Child")}
-                    className="w-full px-3 py-2 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none bg-white font-bold text-navy-950"
-                  >
-                    <option value="Adult">Adult</option>
-                    <option value="Child">Gair Baliqh</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block text-xs font-bold text-navy-900 mb-1">3. Gender *</label>
+                <select
+                  value={memberGenderType}
+                  onChange={(e) => setMemberGenderType(e.target.value)}
+                  className="w-full px-4 py-2 rounded-xl border border-cream-300 focus:ring-2 focus:ring-navy-900 focus:outline-none bg-white font-bold text-navy-950"
+                >
+                  <option value="Male Adult">Male Adult</option>
+                  <option value="Female Adult">Female Adult</option>
+                  <option value="Gair Baligh">Gair Baligh</option>
+                </select>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-cream-200">

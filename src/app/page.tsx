@@ -118,6 +118,105 @@ export default function EventHomepage() {
         </div>
       </section>
 
+      {/* 2. General Instructions Section (Directly Below Hero Banner) */}
+      <section className="bg-white rounded-3xl p-5 sm:p-6 border border-cream-300 premium-card space-y-3.5 shadow-xl">
+        <div className="flex items-center justify-between gap-2 border-b border-cream-200 pb-3">
+          <div className="flex items-center gap-2 font-black text-navy-950 text-base sm:text-lg shrink-0">
+            <Info className="w-5 h-5 text-gold-600 shrink-0" />
+            <span className="whitespace-nowrap">General Instructions</span>
+          </div>
+          <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider px-3 py-1 bg-gold-600 text-white rounded-full shrink-0 shadow-sm">
+            Important Notice
+          </span>
+        </div>
+
+        <div className="border border-cream-300 rounded-2xl bg-cream-50/50 divide-y divide-cream-200/80 overflow-hidden text-xs sm:text-sm">
+          {/* Instruction Item 1: Digital Entry Pass */}
+          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
+            <div className="w-7 h-7 rounded-full bg-navy-950 text-gold-400 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+              <Smartphone className="w-4 h-4" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="font-extrabold text-navy-950 block text-sm sm:text-base">
+                Digital Entry Pass:
+              </span>
+              <p className="text-slate-700 font-medium leading-relaxed text-xs sm:text-sm">
+                Mumineen must <strong className="text-navy-950 font-bold underline decoration-gold-500/50">show their digital pass screen on mobile phone at the entrance counter</strong> to gain entry.
+              </p>
+            </div>
+          </div>
+
+          {/* Instruction Item 2: Physical ITS Card */}
+          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
+            <div className="w-7 h-7 rounded-full bg-gold-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+              <CreditCard className="w-4 h-4" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="font-extrabold text-navy-950 block text-sm sm:text-base">
+                Bring Physical ITS Card:
+              </span>
+              <p className="text-slate-700 font-medium leading-relaxed text-xs sm:text-sm">
+                Kindly <strong className="text-navy-950 font-bold underline decoration-gold-500/50">bring your physical ITS card for scanning and verification</strong> at the entrance counter.
+              </p>
+            </div>
+          </div>
+
+          {/* Instruction Item 3: Bring Your Own Chair */}
+          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
+            <div className="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+              <Armchair className="w-4 h-4" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="font-extrabold text-navy-950 block text-sm sm:text-base">
+                Bring Your Own Chair:
+              </span>
+              <p className="text-slate-700 font-medium leading-relaxed text-xs sm:text-sm">
+                Kindly bring your own chair if required. Chairs will <strong className="text-red-700 font-black">NOT be provided under any circumstances</strong> at the venue.
+              </p>
+            </div>
+          </div>
+
+          {/* Instruction Item 4: Parking Note & Guidance */}
+          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
+            <div className="w-7 h-7 rounded-full bg-navy-900 text-gold-400 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+              <Car className="w-4 h-4" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="font-extrabold text-navy-950 block text-sm sm:text-base">
+                Parking Note & Guidance:
+              </span>
+              <p className="text-slate-700 font-medium leading-relaxed text-xs sm:text-sm">
+                Park your vehicle at designated parking space and <strong className="text-navy-950 font-bold underline decoration-gold-500/50">a Khidmatguzar will guide you in parking</strong> upon arrival. <strong className="text-red-700 font-black">Please travel by bus if possible for ease of traffic.</strong>
+              </p>
+            </div>
+          </div>
+
+          {/* Instruction Item 5: Single Family Registration */}
+          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
+            <div className="w-7 h-7 rounded-full bg-slate-300 text-navy-950 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+              <Users className="w-4 h-4" />
+            </div>
+            <div className="space-y-0.5">
+              <span className="font-extrabold text-navy-950 block text-sm sm:text-base">
+                Single Family Registration:
+              </span>
+              <p className="text-slate-700 font-medium leading-relaxed text-xs sm:text-sm">
+                Please submit only one registration form response per family or group to ensure accurate arrangements.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Assistance Footer Banner */}
+        <div className="pt-3 border-t border-cream-200 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-extrabold text-navy-950">
+          <div className="flex items-center gap-1.5">
+            <PhoneCall className="w-4 h-4 text-gold-600 shrink-0" />
+            <span>For Online Assistance: <strong>+91 98235 63647</strong></span>
+          </div>
+          <span className="text-slate-600 font-bold">(Huzefa bhai - Jamaat Member)</span>
+        </div>
+      </section>
+
       {/* 2. Full-Width Registration Banner */}
       <section>
         {isRegistrationOpen ? (
@@ -256,107 +355,8 @@ export default function EventHomepage() {
         </div>
       </section>
 
-      {/* 5. Niyaz e Hussain Payment QR Code Section (Placed Below Venue, Before Instructions) */}
+      {/* 5. Niyaz e Hussain Payment QR Code Section (Placed Below Venue) */}
       <DigitalQrCard size="large" />
-
-      {/* 6. General Instructions Section */}
-      <section className="bg-white rounded-3xl p-5 sm:p-7 border border-cream-300 premium-card space-y-4 shadow-xl">
-        <div className="flex items-center justify-between gap-2 border-b border-cream-200 pb-3.5">
-          <div className="flex items-center gap-2 font-black text-navy-950 text-base sm:text-lg shrink-0">
-            <Info className="w-5 h-5 text-gold-600 shrink-0" />
-            <span className="whitespace-nowrap">General Instructions</span>
-          </div>
-          <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-3 py-1 bg-gold-600 text-white rounded-full shrink-0 shadow-sm">
-            Important Notice
-          </span>
-        </div>
-
-        <div className="border border-cream-300 rounded-2xl bg-cream-50/50 divide-y divide-cream-200/80 overflow-hidden text-xs sm:text-sm">
-          {/* Instruction Item 1: Digital Entry Pass */}
-          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
-            <div className="w-7 h-7 rounded-full bg-navy-950 text-gold-400 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-              <Smartphone className="w-4 h-4" />
-            </div>
-            <div className="space-y-0.5">
-              <span className="font-extrabold text-navy-950 block text-xs sm:text-sm">
-                Digital Entry Pass:
-              </span>
-              <p className="text-slate-700 font-medium leading-relaxed text-xs">
-                Mumineen must <strong className="text-navy-950 font-bold underline decoration-gold-500/50">show their digital pass screen on mobile phone at the entrance counter</strong> to gain entry.
-              </p>
-            </div>
-          </div>
-
-          {/* Instruction Item 2: Physical ITS Card */}
-          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
-            <div className="w-7 h-7 rounded-full bg-gold-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-              <CreditCard className="w-4 h-4" />
-            </div>
-            <div className="space-y-0.5">
-              <span className="font-extrabold text-navy-950 block text-xs sm:text-sm">
-                Bring Physical ITS Card:
-              </span>
-              <p className="text-slate-700 font-medium leading-relaxed text-xs">
-                Kindly <strong className="text-navy-950 font-bold underline decoration-gold-500/50">bring your physical ITS card for scanning and verification</strong> at the entrance counter.
-              </p>
-            </div>
-          </div>
-
-          {/* Instruction Item 3: Bring Your Own Chair */}
-          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
-            <div className="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-              <Armchair className="w-4 h-4" />
-            </div>
-            <div className="space-y-0.5">
-              <span className="font-extrabold text-navy-950 block text-xs sm:text-sm">
-                Bring Your Own Chair:
-              </span>
-              <p className="text-slate-700 font-medium leading-relaxed text-xs">
-                Kindly bring your own chair if required. Chairs will <strong className="text-red-700 font-black">NOT be provided under any circumstances</strong> at the venue.
-              </p>
-            </div>
-          </div>
-
-          {/* Instruction Item 4: Parking Note & Guidance */}
-          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
-            <div className="w-7 h-7 rounded-full bg-navy-900 text-gold-400 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-              <Car className="w-4 h-4" />
-            </div>
-            <div className="space-y-0.5">
-              <span className="font-extrabold text-navy-950 block text-xs sm:text-sm">
-                Parking Note & Guidance:
-              </span>
-              <p className="text-slate-700 font-medium leading-relaxed text-xs">
-                Park your vehicle at designated parking space and <strong className="text-navy-950 font-bold underline decoration-gold-500/50">a Khidmatguzar will guide you in parking</strong> upon arrival.
-              </p>
-            </div>
-          </div>
-
-          {/* Instruction Item 5: Single Family Registration */}
-          <div className="p-3.5 sm:p-4 flex items-start gap-3 hover:bg-cream-100/50 transition">
-            <div className="w-7 h-7 rounded-full bg-slate-300 text-navy-950 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-              <Users className="w-4 h-4" />
-            </div>
-            <div className="space-y-0.5">
-              <span className="font-extrabold text-navy-950 block text-xs sm:text-sm">
-                Single Family Registration:
-              </span>
-              <p className="text-slate-700 font-medium leading-relaxed text-xs">
-                Please submit only one registration form response per family or group to ensure accurate arrangements.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Assistance Footer Banner */}
-        <div className="pt-3 border-t border-cream-200 flex flex-wrap items-center justify-between gap-2 text-xs font-bold text-navy-950">
-          <div className="flex items-center gap-1.5">
-            <PhoneCall className="w-4 h-4 text-gold-600 shrink-0" />
-            <span>For Online Assistance: <strong>+91 98235 63647</strong></span>
-          </div>
-          <span className="text-slate-600 font-bold">(Huzefa bhai - Jamaat Member)</span>
-        </div>
-      </section>
     </div>
   );
 }

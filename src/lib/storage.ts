@@ -452,7 +452,7 @@ export function saveStore(store: AppStore) {
   }
 }
 
-export const MAX_EVENT_CAPACITY = 1400;
+export const MAX_EVENT_CAPACITY = 1800;
 
 /**
  * Calculate weighted seat count: Adult = 1.0, Child (Gair Baliqh) = 0.5

@@ -32,7 +32,6 @@ export function buildFormattedSheetRows(eventName: string, familyGroups: Formatt
     "Name",
     "Status",
     "Gender",
-    "Type",
     "Mobile Number",
     "Mauze",
     "Transportation",
@@ -48,12 +47,15 @@ export function buildFormattedSheetRows(eventName: string, familyGroups: Formatt
         if (!isNaN(num)) contribVal = num;
       }
 
+      const genderDisplay = member.type === "Child" || member.gender === "Child" || member.gender === "Gair Baligh"
+        ? "Gair Baligh"
+        : `${member.gender} Adult`;
+
       rows.push([
         member.itsId,
         member.name,
         member.status,
-        member.gender,
-        member.type === "Child" ? "Gair Baliqh" : "Adult",
+        genderDisplay,
         member.mobileNumber,
         family.mauze || "—",
         family.transportMode || "—",
@@ -78,8 +80,7 @@ export function generateExcelBuffer(eventName: string, familyGroups: FormattedFa
     { wch: 14 },
     { wch: 26 },
     { wch: 18 },
-    { wch: 10 },
-    { wch: 12 },
+    { wch: 16 },
     { wch: 16 },
     { wch: 16 },
     { wch: 16 },
