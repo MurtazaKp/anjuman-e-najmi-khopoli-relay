@@ -16,7 +16,8 @@ import {
   Heart,
   PhoneCall,
   User,
-  Navigation
+  Navigation,
+  Sparkles
 } from "lucide-react";
 import ScreenshotGuard from "@/components/ScreenshotGuard";
 
@@ -149,9 +150,13 @@ export default function PassesPage() {
             <h2 className="text-2xl sm:text-3xl font-black text-navy-950 pt-1 leading-tight">
               Registration Confirmed for {family.hofName}'s Family
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed max-w-lg mx-auto">
-              Assalamu Alaikum! Your family registration for <strong>{event?.name || "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H"}</strong> is <strong>100% Confirmed</strong>. Official digital entry pass cards with QR codes will be unlocked right here once Jamaat Admin issues passes after registration closes.
-            </p>
+            <div className="mx-auto pt-1.5 flex justify-center">
+              <div className="animate-pulse inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gold-600 text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-md border border-gold-400">
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" />
+                <span>Pass Under Process</span>
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" />
+              </div>
+            </div>
           </div>
 
           {/* Registered Family Members Summary Box */}
