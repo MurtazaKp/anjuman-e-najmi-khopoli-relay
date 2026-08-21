@@ -34,12 +34,18 @@ export async function getActiveEvent() {
 }
 
 export async function checkDuplicateItsId(eventId: string, itsId: string) {
-  await loadStoreFromSupabase();
+  const store = getStore();
+  if (!store || store.families.length === 0) {
+    await loadStoreFromSupabase();
+  }
   return checkDuplicateItsIdData(eventId, itsId);
 }
 
 export async function registerFamily(eventId: string, input: RegisterFamilyInput) {
-  await loadStoreFromSupabase();
+  const store = getStore();
+  if (!store || store.families.length === 0) {
+    await loadStoreFromSupabase();
+  }
   return registerFamilyData(eventId, input);
 }
 

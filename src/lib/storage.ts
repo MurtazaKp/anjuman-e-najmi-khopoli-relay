@@ -223,10 +223,12 @@ export async function loadStoreFromSupabase(): Promise<AppStore | null> {
   if (!isConf || !client) return null;
 
   try {
-    const dbEvents = await supabaseRestFetch("events");
-    const dbFamilies = await supabaseRestFetch("families");
-    const dbMembers = await supabaseRestFetch("members");
-    const dbPasses = await supabaseRestFetch("passes");
+    const [dbEvents, dbFamilies, dbMembers, dbPasses] = await Promise.all([
+      supabaseRestFetch("events"),
+      supabaseRestFetch("families"),
+      supabaseRestFetch("members"),
+      supabaseRestFetch("passes"),
+    ]);
 
     if (!dbEvents || dbEvents.length === 0) return null;
 
