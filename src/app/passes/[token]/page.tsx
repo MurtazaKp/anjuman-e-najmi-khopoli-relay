@@ -148,9 +148,6 @@ export default function PassesPage() {
               <CheckCircle2 className="w-4 h-4 text-emerald-700" />
               <span>Registration Confirmed</span>
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-navy-950 pt-1 leading-tight">
-              Registration Confirmed for {family.hofName}'s Family
-            </h2>
             <div className="mx-auto pt-1.5 flex justify-center">
               <div className="animate-pulse inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gold-600 text-white font-black text-xs sm:text-sm uppercase tracking-wider shadow-md border border-gold-400">
                 <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white shrink-0" />
