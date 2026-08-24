@@ -427,17 +427,24 @@ export default function RegisterPage() {
             <span>Note: Please submit only one response per family or group to ensure accurate results.</span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-[11px] text-emerald-950 font-bold flex items-center justify-between gap-2 shadow-sm">
+          <div className="p-2.5 sm:p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-[11px] sm:text-xs text-emerald-950 font-bold flex flex-wrap items-center justify-between gap-2 shadow-sm">
+            <div className="flex items-center gap-1.5">
+              <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>For any technical issue click here:</span>
+            </div>
+
             <a 
-              href="https://wa.me/919403825153" 
+              href="https://wa.me/919403825153?text=Assalamu%20Alaikum,%20I%20need%20help%20with%20Khopoli%20Relay%20Registration" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="flex items-center gap-1.5 hover:underline"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#25D366] hover:bg-[#20ba5a] text-white font-black text-[11px] shadow border border-emerald-400 shrink-0 transition transform hover:scale-105 active:scale-95"
             >
-              <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>For any technical issue: <strong className="underline text-emerald-900">+91 94038 25153</strong></span>
+              <svg className="w-3.5 h-3.5 fill-current text-white shrink-0" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.67-1.616-.918-2.213-.242-.58-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.572-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 2C6.477 2 2 6.477 2 12c0 2.15.679 4.14 1.839 5.776L2.6 21.4l3.771-1.226A9.956 9.956 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18c-1.802 0-3.483-.478-4.938-1.314l-.354-.204-2.247.731.742-2.18-.228-.363A7.957 7.957 0 014 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z"/>
+              </svg>
+              <span>WhatsApp Support</span>
             </a>
-            <span className="text-emerald-700 text-[10px] uppercase tracking-wider font-extrabold bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">(WhatsApp)</span>
           </div>
         </div>
       </div>
