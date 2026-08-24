@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { QrCode, PhoneCall, Copy, Check } from "lucide-react";
+import { QrCode, PhoneCall, Copy, Check, MessageCircle } from "lucide-react";
 
 interface DigitalQrCardProps {
   imageSrc?: string;

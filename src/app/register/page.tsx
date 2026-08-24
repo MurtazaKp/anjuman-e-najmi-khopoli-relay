@@ -426,6 +426,19 @@ export default function RegisterPage() {
             <Info className="w-4 h-4 text-amber-700 shrink-0" />
             <span>Note: Please submit only one response per family or group to ensure accurate results.</span>
           </div>
+
+          <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-300 text-[11px] text-emerald-950 font-bold flex items-center justify-between gap-2 shadow-sm">
+            <a 
+              href="https://wa.me/919403825153" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="flex items-center gap-1.5 hover:underline"
+            >
+              <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>For any technical issue: <strong className="underline text-emerald-900">+91 94038 25153</strong></span>
+            </a>
+            <span className="text-emerald-700 text-[10px] uppercase tracking-wider font-extrabold bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">(WhatsApp)</span>
+          </div>
         </div>
       </div>
 

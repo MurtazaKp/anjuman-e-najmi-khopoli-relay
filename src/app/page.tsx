@@ -16,7 +16,8 @@ import {
   CreditCard,
   Armchair,
   Car,
-  Users
+  Users,
+  MessageCircle
 } from "lucide-react";
 import DigitalQrCard from "@/components/DigitalQrCard";
 
@@ -207,13 +208,18 @@ export default function EventHomepage() {
           </div>
         </div>
 
-        {/* Assistance Footer Banner */}
+        {/* Technical Support Footer Banner */}
         <div className="pt-3 border-t border-cream-200 flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm font-extrabold text-navy-950">
-          <div className="flex items-center gap-1.5">
-            <PhoneCall className="w-4 h-4 text-gold-600 shrink-0" />
-            <span>For Online Assistance: <strong>+91 98235 63647</strong></span>
-          </div>
-          <span className="text-slate-600 font-bold">(Huzefa bhai - Jamaat Member)</span>
+          <a 
+            href="https://wa.me/919403825153" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex items-center gap-1.5 text-emerald-800 hover:text-emerald-950 transition"
+          >
+            <MessageCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>For any technical issue: <strong className="underline decoration-emerald-500 text-emerald-900">+91 94038 25153</strong></span>
+          </a>
+          <span className="text-emerald-700 font-bold text-[11px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">(WhatsApp this number)</span>
         </div>
       </section>
 
