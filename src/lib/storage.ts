@@ -645,11 +645,21 @@ export async function registerFamilyData(
     })),
   };
 
-  // Fire-and-forget background sync to Google Sheets
-  syncToGoogleSheetWebhook({
-    eventName: event.name,
-    family: formattedGroup,
-  }).catch((err) => console.error("[Google Sheet Webhook Error]", err));
+  // Await both Supabase PostgreSQL sync and Google Sheets webhook sync in parallel (Required for Vercel Serverless environment)
+  const syncPromises: Promise<any>[] = [];
+
+  if (isSupabaseConfigured()) {
+    syncPromises.push(syncStoreToSupabase(store));
+  }
+
+  syncPromises.push(
+    syncToGoogleSheetWebhook({
+      eventName: event.name,
+      family: formattedGroup,
+    })
+  );
+
+  await Promise.all(syncPromises).catch((err) => console.error("[Serverless Sync Error]", err));
 
   return newFamily;
 }
