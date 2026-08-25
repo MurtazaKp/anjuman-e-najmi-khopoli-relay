@@ -29,6 +29,17 @@ export default function RootLayout({
             <p className="text-slate-400 text-[11px]">
               Khopoli Relay Centre · Digital Pass System
             </p>
+            <p className="pt-2 border-t border-navy-800/80 text-[10px] text-slate-400 font-normal">
+              Developed by{" "}
+              <a
+                href="https://murtaza-dev.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-amber-300/90 hover:text-amber-200 underline decoration-gold-500/40 hover:decoration-amber-300 transition"
+              >
+                Murtaza Khopoliwala
+              </a>
+            </p>
           </div>
         </footer>
       </body>
