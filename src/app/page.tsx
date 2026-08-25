@@ -358,7 +358,7 @@ export default function EventHomepage() {
           </a>
 
           <a
-            href={event?.parkingMapUrl || "https://www.google.com/maps/place/18%C2%B047'39.0%22N+73%C2%B020'09.9%22E/@18.7941691,73.3335153,17z/data=!3m1!4b1!4m4!3m3!8m2!3d18.7941691!4d73.3360902!18m1!1e1?entry=ttu&g_ep=EgoyMDI2MDgxMi4wIKXMDSoASAFQAw%3D%3D"}
+            href="https://maps.app.goo.gl/vzA2YmLax9NB4VzB6"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-navy-900 hover:bg-navy-950 text-white font-bold text-xs border border-gold-500/40 shadow-md transition"

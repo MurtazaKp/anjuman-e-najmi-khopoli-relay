@@ -1,25 +1,6 @@
 {
   "events": [
     {
-      "id": "evt-khopoli-urs-1448",
-      "slug": "urs-1448",
-      "name": "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H",
-      "description": "Khopoli Relay Centre",
-      "date": "2026-01-16",
-      "time": "09:00 AM",
-      "venue": "Khopoli Relay Centre",
-      "location": "Khopoli",
-      "mapUrl": "https://maps.google.com",
-      "parkingMapUrl": "https://maps.google.com",
-      "latitude": 18.7904,
-      "longitude": 73.3444,
-      "registrationStart": "2026-01-01T00:00:00+00:00",
-      "registrationEnd": "2026-01-15T23:59:59+00:00",
-      "status": "REGISTRATION_OPEN",
-      "isCurrent": true,
-      "passIssueDate": "2026-01-15T00:00:00+00:00"
-    },
-    {
       "id": "event-urs-1448h",
       "slug": "urs-1448h",
       "name": "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H",
@@ -37,48 +18,27 @@
       "status": "REGISTRATION_OPEN",
       "isCurrent": true,
       "passIssueDate": "2026-08-24T07:13:35.214+00:00"
-    }
-  ],
-  "families": [
+    },
     {
-      "id": "fam-1787557072751-136",
-      "eventId": "evt-khopoli-urs-1448",
-      "hofName": "murtaza khopoliwala",
-      "hofItsId": "50499558",
-      "mobileNumber": "9898495849",
-      "mauze": "Lonavala",
-      "transportMode": "Car",
-      "rajabRozaCount": 0,
-      "niyazJaman": "Yes, Jami ne Jaisu",
-      "niyazContribution": "7200",
-      "passLinkToken": "pass-1787557072751-lb0a21",
-      "whatsappStatus": "PENDING",
-      "createdAt": "2026-08-24T07:37:52.751+00:00",
-      "members": [
-        {
-          "id": "mem-fam-1787557072751-136-1",
-          "familyId": "fam-1787557072751-136",
-          "eventId": "evt-khopoli-urs-1448",
-          "itsId": "50499558",
-          "name": "murtaza khopoliwala",
-          "gender": "Male",
-          "type": "Adult",
-          "isHof": true,
-          "createdAt": "2026-08-24T07:37:52.751+00:00"
-        },
-        {
-          "id": "mem-fam-1787557072751-136-2",
-          "familyId": "fam-1787557072751-136",
-          "eventId": "evt-khopoli-urs-1448",
-          "itsId": "40594059",
-          "name": "Taher",
-          "gender": "Male",
-          "type": "Adult",
-          "isHof": false,
-          "createdAt": "2026-08-24T07:37:52.751+00:00"
-        }
-      ]
+      "id": "evt-khopoli-urs-1448",
+      "slug": "urs-1448",
+      "name": "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H",
+      "description": "Khopoli Relay Centre",
+      "date": "2026-01-16",
+      "time": "09:00 AM",
+      "venue": "Maharaja Lawns - Khopoli",
+      "location": "Khopoli",
+      "mapUrl": "https://maps.google.com/?q=Maharaja+Lawns+Khopoli",
+      "parkingMapUrl": "https://maps.app.goo.gl/vzA2YmLax9NB4VzB6",
+      "latitude": 18.7904,
+      "longitude": 73.3444,
+      "registrationStart": "2026-01-01T00:00:00+00:00",
+      "registrationEnd": "2026-01-15T23:59:59+00:00",
+      "status": "REGISTRATION_OPEN",
+      "isCurrent": true,
+      "passIssueDate": "2026-08-25T09:52:01.174+00:00"
     }
   ],
+  "families": [],
   "passes": []
 }
