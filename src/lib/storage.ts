@@ -941,3 +941,143 @@ export function getFormattedExportData(eventId: string) {
     familyGroups,
   };
 }
+
+/**
+ * Cancel/Delete an individual registration (or entire family) by member ITS ID
+ */
+export async function cancelMemberRegistration(
+  itsId: string,
+  options?: { cancelEntireFamily?: boolean }
+) {
+  const store = getStore();
+  const cleanIts = itsId.trim();
+
+  // Find family containing this ITS ID
+  let targetFamilyIndex = -1;
+  let targetMemberIndex = -1;
+
+  for (let fIdx = 0; fIdx < store.families.length; fIdx++) {
+    const mIdx = store.families[fIdx].members.findIndex(
+      (m) => m.itsId.trim() === cleanIts
+    );
+    if (mIdx !== -1) {
+      targetFamilyIndex = fIdx;
+      targetMemberIndex = mIdx;
+      break;
+    }
+  }
+
+  if (targetFamilyIndex === -1) {
+    throw new Error(`No registration found for ITS ID ${cleanIts}`);
+  }
+
+  const family = store.families[targetFamilyIndex];
+  const member = family.members[targetMemberIndex];
+  const isHof = member.isHof;
+
+  // Case A: User selected to cancel entire family, or this member is the ONLY person in family
+  if (options?.cancelEntireFamily || family.members.length === 1) {
+    // Remove all passes for all family members
+    const memberIds = new Set(family.members.map((m) => m.id));
+    store.passes = store.passes.filter((p) => !memberIds.has(p.memberId));
+
+    // Remove family
+    const removedFamily = store.families.splice(targetFamilyIndex, 1)[0];
+
+    saveStore(store);
+
+    // Delete directly from Supabase PostgreSQL Database
+    if (isSupabaseConfigured()) {
+      const { url, key } = getSupabaseCredentials();
+      const authHeaders = {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      };
+      await Promise.all([
+        fetch(`${url}/rest/v1/passes?family_id=eq.${removedFamily.id}`, { method: "DELETE", headers: authHeaders }),
+        fetch(`${url}/rest/v1/members?family_id=eq.${removedFamily.id}`, { method: "DELETE", headers: authHeaders }),
+        fetch(`${url}/rest/v1/families?id=eq.${removedFamily.id}`, { method: "DELETE", headers: authHeaders }),
+      ]).catch((e) => console.error("[Supabase Cancel Family Deletion Error]", e));
+    }
+
+    return {
+      success: true,
+      cancelledType: "ENTIRE_FAMILY",
+      cancelledName: removedFamily.hofName,
+      cancelledIts: removedFamily.hofItsId,
+      message: `Cancelled entire family registration for ${removedFamily.hofName} (${removedFamily.members.length} members).`,
+    };
+  }
+
+  // Case B: Single member cancellation (Multi-member family)
+  if (isHof) {
+    // Member is HOF: Promote next member to HOF
+    family.members.splice(targetMemberIndex, 1);
+    const newHof = family.members[0];
+    newHof.isHof = true;
+    family.hofName = newHof.name;
+    family.hofItsId = newHof.itsId;
+
+    // Remove cancelled HOF pass
+    store.passes = store.passes.filter((p) => p.memberId !== member.id);
+  } else {
+    // Non-HOF member: Remove member
+    family.members.splice(targetMemberIndex, 1);
+    store.passes = store.passes.filter((p) => p.memberId !== member.id);
+  }
+
+  saveStore(store);
+
+  // Delete/Update directly in Supabase PostgreSQL Database
+  if (isSupabaseConfigured()) {
+    const { url, key } = getSupabaseCredentials();
+    const authHeaders = {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    };
+
+    const reqs: Promise<any>[] = [
+      fetch(`${url}/rest/v1/members?id=eq.${member.id}`, { method: "DELETE", headers: authHeaders }),
+      fetch(`${url}/rest/v1/passes?member_id=eq.${member.id}`, { method: "DELETE", headers: authHeaders }),
+    ];
+
+    if (isHof && family.members.length > 0) {
+      const newHof = family.members[0];
+      reqs.push(
+        fetch(`${url}/rest/v1/families?id=eq.${family.id}`, {
+          method: "PATCH",
+          headers: authHeaders,
+          body: JSON.stringify({
+            hof_name: family.hofName,
+            hof_its_id: family.hofItsId,
+          }),
+        })
+      );
+      reqs.push(
+        fetch(`${url}/rest/v1/members?id=eq.${newHof.id}`, {
+          method: "PATCH",
+          headers: authHeaders,
+          body: JSON.stringify({
+            is_hof: true,
+          }),
+        })
+      );
+    }
+
+    await Promise.all(reqs).catch((e) => console.error("[Supabase Cancel Member Deletion Error]", e));
+  }
+
+  return {
+    success: true,
+    cancelledType: "SINGLE_MEMBER",
+    cancelledName: member.name,
+    cancelledIts: member.itsId,
+    wasHof: isHof,
+    newHofName: isHof ? family.hofName : undefined,
+    message: `Cancelled registration for ${member.name} (ITS: ${member.itsId}).${
+      isHof ? ` New HOF updated to ${family.hofName}.` : ""
+    }`,
+  };
+}

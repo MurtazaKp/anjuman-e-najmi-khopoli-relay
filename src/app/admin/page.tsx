@@ -36,6 +36,8 @@ export default function AdminPage() {
   const [generatingPasses, setGeneratingPasses] = useState(false);
   const [syncingSheet, setSyncingSheet] = useState(false);
   const [clearingStore, setClearingStore] = useState(false);
+  const [cancelItsId, setCancelItsId] = useState("");
+  const [cancellingIndividual, setCancellingIndividual] = useState(false);
   const [actionMsg, setActionMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -231,6 +233,51 @@ export default function AdminPage() {
     } catch (err: any) {
       setClearingStore(false);
       setErrorMsg(err.message);
+    }
+  };
+
+  const handleCancelIndividual = async (cancelEntireFamily: boolean = false) => {
+    const cleanIts = cancelItsId.trim();
+    if (!cleanIts) {
+      setErrorMsg("Please enter a valid ITS ID to cancel.");
+      return;
+    }
+
+    const confirmMsg = cancelEntireFamily
+      ? `⚠️ Cancel ENTIRE family registration for ITS ID ${cleanIts}?`
+      : `⚠️ Cancel individual registration for ITS ID ${cleanIts}? (If HOF, next member will be promoted to HOF)`;
+
+    if (!window.confirm(confirmMsg)) return;
+
+    setCancellingIndividual(true);
+    setActionMsg("");
+    setErrorMsg("");
+
+    try {
+      const res = await fetch("/api/admin/cancel-registration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: authenticatedEmail,
+          pin: ADMIN_VERIFICATION_PIN,
+          itsId: cleanIts,
+          cancelEntireFamily,
+        }),
+      });
+
+      const data = await res.json();
+      setCancellingIndividual(false);
+
+      if (res.ok) {
+        setActionMsg(data.message || "Registration cancelled successfully!");
+        setCancelItsId("");
+        fetchActiveEvent();
+      } else {
+        setErrorMsg(data.error || "Failed to cancel registration.");
+      }
+    } catch (err: any) {
+      setCancellingIndividual(false);
+      setErrorMsg(err.message || "Failed to cancel registration.");
     }
   };
 
@@ -549,6 +596,50 @@ export default function AdminPage() {
           >
             Close Registration
           </button>
+        </div>
+      </section>
+
+      {/* 3.5 Individual Registration Cancellation & HOF Management */}
+      <section className="bg-white rounded-2xl p-4 sm:p-6 border border-amber-300 premium-card space-y-4 shadow-sm">
+        <div className="border-b border-amber-200 pb-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 font-black text-navy-950 text-sm sm:text-base">
+            <ShieldAlert className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 shrink-0" />
+            <span>Cancel Individual Registration / HOF Pass</span>
+          </div>
+          <span className="text-[9px] sm:text-[10px] font-black uppercase px-2 py-0.5 bg-amber-100 text-amber-900 rounded border border-amber-200 shrink-0">
+            Member Management
+          </span>
+        </div>
+
+        <p className="text-xs text-slate-600 leading-relaxed font-medium">
+          Cancel a single person's registration or pass by their 8-digit ITS ID. If the person is the <strong>HOF</strong>, you can cancel only their registration (next family member will be promoted to HOF) or cancel the entire family.
+        </p>
+
+        <div className="space-y-3 pt-1">
+          <input
+            type="text"
+            placeholder="Enter Member ITS ID (e.g. 50499558)"
+            value={cancelItsId}
+            onChange={(e) => setCancelItsId(e.target.value)}
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-amber-500 focus:outline-none"
+          />
+
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              onClick={() => handleCancelIndividual(false)}
+              disabled={cancellingIndividual || !cancelItsId.trim()}
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white font-bold text-xs shadow-sm transition flex items-center justify-center gap-2"
+            >
+              <span>{cancellingIndividual ? "Cancelling..." : "Cancel Only This Person's Pass"}</span>
+            </button>
+            <button
+              onClick={() => handleCancelIndividual(true)}
+              disabled={cancellingIndividual || !cancelItsId.trim()}
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-xs shadow-sm transition flex items-center justify-center gap-2"
+            >
+              <span>{cancellingIndividual ? "Cancelling..." : "Cancel Entire Family"}</span>
+            </button>
+          </div>
         </div>
       </section>
 
