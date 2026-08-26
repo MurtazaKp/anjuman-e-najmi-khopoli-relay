@@ -28,20 +28,39 @@ export function getSupabaseClient(): SupabaseClient {
 
 export const supabase = getSupabaseClient();
 
-export async function supabaseRestFetch<T = any>(table: string, queryParams: string = "select=*"): Promise<T[] | null> {
+export async function supabaseRestFetch<T = any>(table: string, filterQuery: string = ""): Promise<T[] | null> {
   try {
     const { url, key } = getSupabaseCredentials();
-    const endpoint = `${url}/rest/v1/${table}?${queryParams}`;
-    const res = await fetch(endpoint, {
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as T[];
+    const PAGE_SIZE = 1000;
+    let allRows: T[] = [];
+    let page = 0;
+
+    while (true) {
+      const start = page * PAGE_SIZE;
+      const end = start + PAGE_SIZE - 1;
+      const queryStr = filterQuery ? `select=*&${filterQuery}` : "select=*";
+      const endpoint = `${url}/rest/v1/${table}?${queryStr}`;
+
+      const res = await fetch(endpoint, {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+          "Range": `${start}-${end}`,
+        },
+        cache: "no-store",
+      });
+
+      if (!res.ok) break;
+      const rows = (await res.json()) as T[];
+      if (!rows || rows.length === 0) break;
+
+      allRows = allRows.concat(rows);
+      if (rows.length < PAGE_SIZE) break;
+      page++;
+    }
+
+    return allRows;
   } catch (e) {
     return null;
   }

@@ -471,10 +471,10 @@ export function getActiveEventData(): EventData & { totalRegisteredMembers: numb
   const current = store.events.find((e) => e.isCurrent) || store.events[0];
   const activeEvent = current || DEFAULT_EVENT;
 
-  const eventFamilies = store.families.filter((f) => !f.eventId || f.eventId === activeEvent.id);
-  const totalRegisteredMembers = eventFamilies.reduce((acc, f) => acc + f.members.length, 0);
+  const eventFamilies = store.families;
+  const totalRegisteredMembers = eventFamilies.reduce((acc, f) => acc + (f.members ? f.members.length : 0), 0);
   const weightedCapacityCount = eventFamilies.reduce(
-    (acc, f) => acc + calculateWeightedMemberCount(f.members),
+    (acc, f) => acc + calculateWeightedMemberCount(f.members || []),
     0
   );
 

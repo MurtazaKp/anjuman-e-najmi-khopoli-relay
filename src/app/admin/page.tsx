@@ -38,6 +38,7 @@ export default function AdminPage() {
   const [clearingStore, setClearingStore] = useState(false);
   const [cancelItsId, setCancelItsId] = useState("");
   const [cancellingIndividual, setCancellingIndividual] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [actionMsg, setActionMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -64,7 +65,7 @@ export default function AdminPage() {
 
   const fetchActiveEvent = async () => {
     try {
-      const res = await fetch("/api/events/active");
+      const res = await fetch(`/api/events/active?t=${Date.now()}`, { cache: "no-store" });
       const data = await res.json();
       if (data.event) setEvent(data.event);
       setLoading(false);
@@ -72,6 +73,14 @@ export default function AdminPage() {
       console.error(err);
       setLoading(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchActiveEvent();
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
   };
 
   // Handle Admin Email Verification
@@ -487,11 +496,16 @@ export default function AdminPage() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={fetchActiveEvent}
-              className="p-1.5 rounded-lg bg-cream-100 hover:bg-cream-200 text-navy-950 transition border border-cream-300"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className={`p-1.5 rounded-lg transition-all duration-300 border active:scale-90 ${
+                isRefreshing
+                  ? "bg-gold-100 border-gold-500 text-gold-700 ring-2 ring-gold-400/50"
+                  : "bg-cream-100 hover:bg-cream-200 text-navy-950 border-cream-300"
+              }`}
               title="Refresh live capacity count"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-gold-600" : ""}`} />
             </button>
             <span className="text-xs font-black px-2.5 py-1 rounded-full bg-cream-100 text-navy-950 border border-cream-300">
               {event?.weightedCapacityCount !== undefined ? event.weightedCapacityCount : (event?.totalRegisteredMembers || 0)} / {event?.maxCapacity || 15} Capacity Units
