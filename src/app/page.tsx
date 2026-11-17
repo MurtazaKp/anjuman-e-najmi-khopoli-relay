@@ -102,14 +102,14 @@ export default function EventHomepage() {
           </div>
 
           <h1 className="text-xl sm:text-3xl font-black tracking-tight leading-tight text-white drop-shadow-md">
-            {event?.name || "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H"}
+            {event?.name || "Zikrah Waaz Majlis 1448H"}
           </h1>
 
           {/* Quick Info Pills */}
           <div className="pt-1.5 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] sm:text-xs text-amber-200 font-bold">
             <div className="flex items-center gap-2 bg-navy-950/80 px-3 py-2 rounded-xl backdrop-blur-md border border-gold-600/50 shadow">
               <Calendar className="w-4 h-4 text-gold-400 shrink-0" />
-              <span>{event?.date || "16th Rabi al-Awwal 1448H"}</span>
+              <span>{event?.date || "16 Rajab al-Asab"}</span>
             </div>
             <div className="flex items-center gap-2 bg-navy-950/80 px-3 py-2 rounded-xl backdrop-blur-md border border-gold-600/50 shadow">
               <Clock className="w-4 h-4 text-gold-400 shrink-0" />

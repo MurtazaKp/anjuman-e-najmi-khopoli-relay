@@ -21,11 +21,12 @@ export interface FormattedFamilyGroup {
 }
 
 export function buildFormattedSheetRows(eventName: string, familyGroups: FormattedFamilyGroup[]): any[][] {
+  const NUM_COLS = 9;
   const rows: any[][] = [];
 
-  rows.push(["KHOPOLI RELAY CENTRE"]);
-  rows.push([eventName]);
-  rows.push([]);
+  rows.push(["KHOPOLI RELAY CENTRE", "", "", "", "", "", "", "", ""]);
+  rows.push([eventName, "", "", "", "", "", "", "", ""]);
+  rows.push(["", "", "", "", "", "", "", "", ""]);
 
   rows.push([
     "ITS",
@@ -73,7 +74,11 @@ export function buildFormattedSheetRows(eventName: string, familyGroups: Formatt
     });
   });
 
-  return rows;
+  return rows.map((r) => {
+    const row = [...r];
+    while (row.length < NUM_COLS) row.push("");
+    return row.slice(0, NUM_COLS);
+  });
 }
 
 export function generateExcelBuffer(eventName: string, familyGroups: FormattedFamilyGroup[]): Buffer {
@@ -125,6 +130,7 @@ export async function syncFullStoreToGoogleSheet(data: {
       body: JSON.stringify({
         action: "FULL_SYNC",
         eventName: data.eventName,
+        tabName: data.eventName,
         familyGroups: data.familyGroups,
         rows: formattedRows,
       }),
@@ -166,6 +172,7 @@ export async function syncToGoogleSheetWebhook(data: {
       body: JSON.stringify({
         action: "SINGLE_FAMILY",
         eventName: data.eventName,
+        tabName: data.eventName,
         family: data.family,
       }),
       redirect: 'follow',

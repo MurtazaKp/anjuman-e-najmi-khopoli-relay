@@ -15,31 +15,43 @@ export async function GET(
     }
 
     const cleanToken = token.trim();
+    const activeEv = await getActiveEvent();
+    if (!activeEv) {
+      return NextResponse.json({ error: "No active event found" }, { status: 404 });
+    }
 
-    // 1. Direct real-time Supabase Database Search First via REST API
+    // 1. Direct real-time Supabase Database Search scoped strictly to the ACTIVE EVENT
     if (isSupabaseConfigured()) {
-      const directMembers = await supabaseRestFetch("members", `its_id=eq.${cleanToken}`);
+      const directMembers = await supabaseRestFetch(
+        "members",
+        `its_id=eq.${cleanToken}&event_id=eq.${activeEv.id}`
+      );
       let targetFamilyId = directMembers && directMembers.length > 0 ? directMembers[0].family_id : null;
       let matchedMemberId = directMembers && directMembers.length > 0 ? directMembers[0].id : null;
 
       if (!targetFamilyId) {
-        const famByToken = await supabaseRestFetch("families", `or=(pass_link_token.eq.${cleanToken},hof_its_id.eq.${cleanToken},mobile_number.eq.${cleanToken})`);
+        const famByToken = await supabaseRestFetch(
+          "families",
+          `event_id=eq.${activeEv.id}&or=(pass_link_token.eq.${cleanToken},hof_its_id.eq.${cleanToken},mobile_number.eq.${cleanToken})`
+        );
         if (famByToken && famByToken.length > 0) {
           targetFamilyId = famByToken[0].id;
         }
       }
 
       if (targetFamilyId) {
-        const famList = await supabaseRestFetch("families", `id=eq.${targetFamilyId}`);
+        const famList = await supabaseRestFetch(
+          "families",
+          `id=eq.${targetFamilyId}&event_id=eq.${activeEv.id}`
+        );
         const famData = famList && famList.length > 0 ? famList[0] : null;
-        const allMems = await supabaseRestFetch("members", `family_id=eq.${targetFamilyId}`);
-        const allPasses = await supabaseRestFetch("passes", `family_id=eq.${targetFamilyId}`);
 
         if (famData) {
-          const activeEv = await getActiveEvent();
+          const allMems = await supabaseRestFetch("members", `family_id=eq.${targetFamilyId}&event_id=eq.${activeEv.id}`);
+          const allPasses = await supabaseRestFetch("passes", `family_id=eq.${targetFamilyId}&event_id=eq.${activeEv.id}`);
 
-          // Fetch all event members in order of registration to assign continuous global token numbers (1, 2, 3... 4, 5, 6... etc)
-          const eventMems = await supabaseRestFetch("members", `event_id=eq.${famData.event_id}&order=created_at.asc`);
+          // Fetch all event members in order of registration to assign continuous global token numbers
+          const eventMems = await supabaseRestFetch("members", `event_id=eq.${activeEv.id}&order=created_at.asc`);
           const globalPassNumberMap = new Map<string, number>();
           (eventMems || []).forEach((m: any, idx: number) => {
             globalPassNumberMap.set(m.id, idx + 1);
@@ -66,7 +78,7 @@ export async function GET(
                 (p: any) => p.member_id === m.id || (p.qr_token && p.qr_token.includes(m.its_id))
               );
 
-              const isIssued = Boolean(passObj) || activeEv?.status === "PASSES_ISSUED" || (allPasses && allPasses.length > 0);
+              const isIssued = activeEv?.status === "PASSES_ISSUED" && Boolean(passObj);
 
               const calculatedPassNumber = passObj?.pass_number || globalPassNumberMap.get(m.id) || (idx + 1);
 
@@ -76,7 +88,7 @@ export async function GET(
                     eventId: passObj?.event_id || famData.event_id,
                     memberId: passObj?.member_id || m.id,
                     passNumber: calculatedPassNumber,
-                    qrToken: passObj?.qr_token || `KRC-${(activeEv?.slug || "URS-1448H").toUpperCase()}-${m.its_id}`,
+                    qrToken: passObj?.qr_token || `KRC-${(activeEv?.slug || "EVENT").toUpperCase()}-${m.its_id}`,
                     status: passObj?.status || "ISSUED",
                     checkedInAt: passObj?.checked_in_at || null,
                     checkedInBy: passObj?.checked_in_by || null,
@@ -104,13 +116,13 @@ export async function GET(
       }
     }
 
-    // 2. Fallback to local store
+    // 2. Fallback to local store (scoped to active event)
     const family = await getFamilyPasses(cleanToken);
-    if (family) {
+    if (family && family.eventId === activeEv.id) {
       return NextResponse.json({ success: true, family });
     }
 
-    return NextResponse.json({ error: "Passes not found" }, { status: 404 });
+    return NextResponse.json({ error: "Passes not found for this event" }, { status: 404 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

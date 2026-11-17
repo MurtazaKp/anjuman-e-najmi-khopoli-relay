@@ -16,7 +16,8 @@ import {
   ShieldAlert,
   KeyRound,
   Trash2,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from "lucide-react";
 
 // Authorized Administrator Emails
@@ -455,10 +456,23 @@ export default function AdminPage() {
           Exports registration records in the exact Khopoli Relay Centre format: Single-sheet layout with main event heading, family grouping, blank row separators, and columns (ITS ID, Name, Status, Gender, Mobile Number, Mauze, Transportation, Niyaz Jaman, Niyaz Contribution).
         </p>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
+        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 pt-1">
+          <button
+            type="button"
+            onClick={handleSyncGoogleSheet}
+            disabled={syncingSheet}
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gold-600 hover:bg-gold-700 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 border border-gold-500 disabled:opacity-60 cursor-pointer"
+          >
+            {syncingSheet ? (
+              <Loader2 className="w-4 h-4 text-white animate-spin shrink-0" />
+            ) : (
+              <RefreshCw className="w-4 h-4 text-white shrink-0" />
+            )}
+            <span>{syncingSheet ? "Syncing to Sheet..." : "Sync All to Google Sheet"}</span>
+          </button>
 
           <a
-            href="https://docs.google.com/spreadsheets/d/1xp75B9scBNHy1BobMFhgUwaV41JV39IUnKyz8W-Wwts"
+            href={`https://docs.google.com/spreadsheets/d/${process.env.NEXT_PUBLIC_GOOGLE_SHEET_ID || "1xp75B9scBNHy1BobMFhgUwaV41JV39IUnKyz8W-Wwts"}`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 border border-emerald-500"

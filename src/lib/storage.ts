@@ -73,19 +73,19 @@ const STORE_FILE = path.join(DATA_DIR, "store.json");
 
 // Default initial event
 const DEFAULT_EVENT: EventData = {
-  id: "event-urs-1448h",
-  slug: "urs-1448h",
-  name: "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H",
-  description: "Urs Mubarak of Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. organized by Anjuman E Najmi Khopoli.",
-  date: "16th Rabi al-Awwal 1448H",
+  id: "event-zikra-waaz-majlis-1447h",
+  slug: "zikra-waaz-majlis-1447h",
+  name: "Zikrah Waaz Majlis 1448H",
+  description: "Zikrah Waaz Majlis 1448H organized by Anjuman E Najmi Khopoli.",
+  date: "16 Rajab al-Asab",
   time: "9:00 AM Onwards",
   venue: "Maharaja Lawns - Khopoli",
   location: "L. M. Sable Nagar, Old Mumbai-Pune Highway, Dist. Khopoli, Maharashtra 410203",
-  mapUrl: "https://maps.google.com/?q=Maharaja+Lawns+Khopoli",
+  mapUrl: "https://maps.app.goo.gl/vzA2YmLax9NB4VzB6",
   latitude: 18.7905,
   longitude: 73.3444,
   registrationStart: new Date().toISOString(),
-  registrationEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+  registrationEnd: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
   status: "REGISTRATION_OPEN",
   isCurrent: true,
 };
@@ -166,6 +166,9 @@ const getStoreFilePath = (): string => {
 };
 
 let g_memoryStore: AppStore | null = null;
+// TTL cache: only fetch from Supabase at most once per 60 seconds
+let g_lastSupabaseFetchAt: number = 0;
+const SUPABASE_CACHE_TTL_MS = 60_000; // 60 seconds
 
 /**
  * Get current AppStore from memory cache or JSON file
@@ -213,14 +216,34 @@ export function getStore(): AppStore {
 }
 
 /**
- * Load store directly from Supabase PostgreSQL database
+ * Invalidate the Supabase cache (updates cache timestamp so in-memory store serves immediately)
+ */
+export function invalidateSupabaseCache() {
+  if (g_memoryStore) {
+    g_lastSupabaseFetchAt = Date.now();
+  } else {
+    g_lastSupabaseFetchAt = 0;
+  }
+}
+
+export function forceReloadSupabase() {
+  g_lastSupabaseFetchAt = 0;
+}
+
+/**
+ * Load store directly from Supabase PostgreSQL database (with 60s TTL cache)
  */
 export async function loadStoreFromSupabase(): Promise<AppStore | null> {
   const isConf = isSupabaseConfigured();
   const client = getSupabaseClient();
-  const { url, key } = getSupabaseCredentials();
 
   if (!isConf || !client) return null;
+
+  // Return cached store if it's still fresh
+  const now = Date.now();
+  if (g_memoryStore && g_lastSupabaseFetchAt > 0 && now - g_lastSupabaseFetchAt < SUPABASE_CACHE_TTL_MS) {
+    return g_memoryStore;
+  }
 
   try {
     const [dbEvents, dbFamilies, dbMembers, dbPasses] = await Promise.all([
@@ -301,6 +324,7 @@ export async function loadStoreFromSupabase(): Promise<AppStore | null> {
 
     const store: AppStore = { events, families, passes };
     g_memoryStore = store;
+    g_lastSupabaseFetchAt = Date.now(); // stamp cache time
 
     // Save cache locally
     try {
@@ -434,7 +458,7 @@ export async function syncStoreToSupabase(store: AppStore) {
 /**
  * Save store to JSON file and background sync to Supabase when configured
  */
-export function saveStore(store: AppStore) {
+export function saveStore(store: AppStore, options?: { skipSupabaseBulkSync?: boolean }) {
   g_memoryStore = store;
   try {
     const filePath = getStoreFilePath();
@@ -446,7 +470,7 @@ export function saveStore(store: AppStore) {
 
     fs.writeFileSync(filePath, JSON.stringify(store, null, 2), "utf-8");
 
-    if (isSupabaseConfigured()) {
+    if (isSupabaseConfigured() && !options?.skipSupabaseBulkSync) {
       syncStoreToSupabase(store).catch((e) => console.error("[Supabase Save Error]", e));
     }
   } catch (err) {
@@ -471,7 +495,7 @@ export function getActiveEventData(): EventData & { totalRegisteredMembers: numb
   const current = store.events.find((e) => e.isCurrent) || store.events[0];
   const activeEvent = current || DEFAULT_EVENT;
 
-  const eventFamilies = store.families;
+  const eventFamilies = store.families.filter((f) => f.eventId === activeEvent.id);
   const totalRegisteredMembers = eventFamilies.reduce((acc, f) => acc + (f.members ? f.members.length : 0), 0);
   const weightedCapacityCount = eventFamilies.reduce(
     (acc, f) => acc + calculateWeightedMemberCount(f.members || []),
@@ -624,9 +648,9 @@ export async function registerFamilyData(
     event.status = "REGISTRATION_CLOSED";
   }
 
-  saveStore(store);
+  saveStore(store, { skipSupabaseBulkSync: true });
 
-  // Sync to Google Sheets
+  // Format family group for Google Sheets
   const formattedGroup: FormattedFamilyGroup = {
     hofName: newFamily.hofName,
     hofItsId: newFamily.hofItsId,
@@ -645,21 +669,55 @@ export async function registerFamilyData(
     })),
   };
 
-  // Await both Supabase PostgreSQL sync and Google Sheets webhook sync in parallel (Required for Vercel Serverless environment)
-  const syncPromises: Promise<any>[] = [];
-
+  // Fast direct targeted Supabase insert (~100ms instead of bulk upserting thousands of rows)
   if (isSupabaseConfigured()) {
-    syncPromises.push(syncStoreToSupabase(store));
+    const { url, key } = getSupabaseCredentials();
+    const authHeaders = {
+      apikey: key,
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+      Prefer: "resolution=merge-duplicates",
+    };
+
+    const familyRow = {
+      id: newFamily.id,
+      event_id: newFamily.eventId,
+      hof_name: newFamily.hofName,
+      hof_its_id: newFamily.hofItsId,
+      mobile_number: newFamily.mobileNumber,
+      mauze: newFamily.mauze,
+      transport_mode: newFamily.transportMode,
+      rajab_roza_count: newFamily.rajabRozaCount || 0,
+      niyaz_jaman: newFamily.niyazJaman,
+      niyaz_contribution: newFamily.niyazContribution,
+      pass_link_token: newFamily.passLinkToken,
+      whatsapp_status: newFamily.whatsappStatus,
+      created_at: newFamily.createdAt,
+    };
+
+    const memberRows = createdMembers.map((m) => ({
+      id: m.id,
+      family_id: m.familyId,
+      event_id: m.eventId,
+      its_id: m.itsId,
+      name: m.name,
+      gender: m.gender,
+      type: m.type,
+      is_hof: m.isHof,
+      created_at: m.createdAt,
+    }));
+
+    await Promise.all([
+      fetch(`${url}/rest/v1/families`, { method: "POST", headers: authHeaders, body: JSON.stringify(familyRow) }),
+      fetch(`${url}/rest/v1/members`, { method: "POST", headers: authHeaders, body: JSON.stringify(memberRows) }),
+    ]).catch((err) => console.error("[Supabase Fast Insert Error]", err));
   }
 
-  syncPromises.push(
-    syncToGoogleSheetWebhook({
-      eventName: event.name,
-      family: formattedGroup,
-    })
-  );
-
-  await Promise.all(syncPromises).catch((err) => console.error("[Serverless Sync Error]", err));
+  // Google Sheets webhook sync runs asynchronously in background so response is instant
+  syncToGoogleSheetWebhook({
+    eventName: event.name,
+    family: formattedGroup,
+  }).catch((err) => console.error("[Google Sheets Sync Error]", err));
 
   return newFamily;
 }
@@ -741,18 +799,14 @@ export function getFamilyPassesData(tokenOrIts: string, customStore?: AppStore) 
   const cleanDigits = clean.replace(/\D/g, "");
   const store = customStore || getStore();
 
-  console.log("[Debug Pass Lookup]", {
-    clean,
-    cleanDigits,
-    familiesCount: store.families.length,
-    families: store.families.map((f) => ({
-      hofName: f.hofName,
-      hofItsId: f.hofItsId,
-      memberItsIds: f.members?.map((m) => m.itsId),
-    })),
-  });
+  // Only look up passes for the CURRENT active event
+  const activeEvent = store.events.find((e) => e.isCurrent) || store.events[0];
+  if (!activeEvent) return null;
 
-  let family = store.families.find(
+  // Filter families to active event only
+  const activeFamilies = store.families.filter((f) => f.eventId === activeEvent.id);
+
+  let family = activeFamilies.find(
     (f) =>
       f.passLinkToken === clean ||
       f.hofItsId === clean ||
@@ -943,6 +997,340 @@ export function getFormattedExportData(eventId: string) {
 }
 
 /**
+ * Lookup an ITS ID in current active event, and if not found, in past events.
+ * Returns whether it was found in current event or past event, with family details.
+ * Used for pre-filling past family registrations for new events and managing current registrations.
+ */
+export function lookupItsId(itsId: string): {
+  found: boolean;
+  isCurrentEvent?: boolean;
+  isPastEvent?: boolean;
+  isHof?: boolean;
+  family?: FamilyData;
+  member?: FamilyMemberData;
+  currentFamilyAlreadyRegistered?: {
+    id: string;
+    hofName: string;
+    hofItsId: string;
+    membersCount: number;
+  };
+  alreadyRegisteredItsInCurrentEvent?: string[];
+} {
+  const store = getStore();
+  const cleanIts = itsId.trim();
+
+  const activeEvent = store.events.find((e) => e.isCurrent) || store.events[0];
+  if (!activeEvent) return { found: false };
+
+  // 1. Search in families belonging to the CURRENT active event first
+  for (const family of store.families) {
+    if (family.eventId === activeEvent.id) {
+      const member = family.members.find((m) => m.itsId === cleanIts);
+      if (member) {
+        return {
+          found: true,
+          isCurrentEvent: true,
+          isPastEvent: false,
+          isHof: member.isHof,
+          family,
+          member,
+        };
+      }
+    }
+  }
+
+  // 2. If not found in current event, search in PAST events (newest first)
+  const pastFamilies = store.families
+    .filter((f) => f.eventId !== activeEvent.id)
+    .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+
+  // Collect all ITS IDs already registered in current active event
+  const currentEventIts = new Set<string>();
+  for (const f of store.families) {
+    if (f.eventId === activeEvent.id) {
+      for (const m of f.members) {
+        currentEventIts.add(m.itsId);
+      }
+    }
+  }
+
+  for (const family of pastFamilies) {
+    const member = family.members.find((m) => m.itsId === cleanIts);
+    if (member) {
+      // Check if the HOF or family of this past member is ALREADY registered in the current active event
+      const currentFamily = store.families.find(
+        (f) =>
+          f.eventId === activeEvent.id &&
+          (
+            f.hofItsId === family.hofItsId ||
+            f.members.some((m) => m.itsId === family.hofItsId) ||
+            family.members.some((pm) => pm.itsId !== cleanIts && f.members.some((cm) => cm.itsId === pm.itsId))
+          )
+      );
+
+      return {
+        found: true,
+        isCurrentEvent: false,
+        isPastEvent: true,
+        isHof: member.isHof,
+        family,
+        member,
+        currentFamilyAlreadyRegistered: currentFamily
+          ? {
+              id: currentFamily.id,
+              hofName: currentFamily.hofName,
+              hofItsId: currentFamily.hofItsId,
+              membersCount: currentFamily.members.length,
+            }
+          : undefined,
+        alreadyRegisteredItsInCurrentEvent: Array.from(currentEventIts),
+      };
+    }
+  }
+
+  return { found: false };
+}
+
+/**
+ * Add a member to an existing family (pre-pass-issue)
+ */
+export async function addMemberToFamily(
+  familyId: string,
+  newMember: { itsId: string; name: string; gender: "Male" | "Female"; type: "Adult" | "Child" }
+) {
+  const store = getStore();
+  const family = store.families.find((f) => f.id === familyId);
+  if (!family) throw new Error("Family not found");
+
+  const event = store.events.find((e) => e.id === family.eventId);
+  if (!event) throw new Error("Event not found");
+  if (event.status === "PASSES_ISSUED" || event.status === "COMPLETED") {
+    throw new Error("Cannot edit family after passes have been issued.");
+  }
+
+  // Check duplicate
+  const dup = checkDuplicateItsIdData(family.eventId, newMember.itsId);
+  if (dup.isDuplicate) throw new Error(`ITS ID ${newMember.itsId} is already registered.`);
+
+  const memberId = `mem-${familyId}-${Date.now()}`;
+  const member: FamilyMemberData = {
+    id: memberId,
+    familyId,
+    eventId: family.eventId,
+    itsId: newMember.itsId.trim(),
+    name: newMember.name.trim(),
+    gender: newMember.gender,
+    type: newMember.type,
+    isHof: false,
+    createdAt: new Date().toISOString(),
+  };
+  family.members.push(member);
+  saveStore(store);
+
+  // Sync member to Supabase
+  if (isSupabaseConfigured()) {
+    const { url, key } = getSupabaseCredentials();
+    const authHeaders = { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
+    await fetch(`${url}/rest/v1/members`, {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({
+        id: member.id,
+        family_id: familyId,
+        event_id: family.eventId,
+        its_id: member.itsId,
+        name: member.name,
+        gender: member.gender,
+        type: member.type,
+        is_hof: false,
+        created_at: member.createdAt,
+      }),
+    }).catch((e) => console.error("[Supabase addMember Error]", e));
+  }
+
+  try {
+    const exportData = getFormattedExportData(family.eventId);
+    syncFullStoreToGoogleSheet(exportData).catch((e) =>
+      console.error("[Google Sheet Auto-Sync on addMember Error]", e)
+    );
+  } catch (sheetErr) {
+    console.error("[Google Sheet Auto-Sync Error]", sheetErr);
+  }
+
+  return member;
+}
+
+/**
+ * Remove a member from an existing family (pre-pass-issue, non-HOF only via this path)
+ */
+export async function removeMemberFromFamily(familyId: string, memberId: string) {
+  const store = getStore();
+  const family = store.families.find((f) => f.id === familyId);
+  if (!family) throw new Error("Family not found");
+
+  const event = store.events.find((e) => e.id === family.eventId);
+  if (!event) throw new Error("Event not found");
+  if (event.status === "PASSES_ISSUED" || event.status === "COMPLETED") {
+    throw new Error("Cannot edit family after passes have been issued.");
+  }
+
+  const idx = family.members.findIndex((m) => m.id === memberId);
+  if (idx === -1) throw new Error("Member not found in family");
+  if (family.members[idx].isHof) throw new Error("Cannot remove HOF via this route. Use cancel-registration.");
+
+  const [removed] = family.members.splice(idx, 1);
+  saveStore(store);
+
+  if (isSupabaseConfigured()) {
+    const { url, key } = getSupabaseCredentials();
+    const authHeaders = { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
+    await fetch(`${url}/rest/v1/members?id=eq.${removed.id}`, { method: "DELETE", headers: authHeaders })
+      .catch((e) => console.error("[Supabase removeMember Error]", e));
+  }
+
+  try {
+    const exportData = getFormattedExportData(event.id);
+    syncFullStoreToGoogleSheet(exportData).catch((e) =>
+      console.error("[Google Sheet Auto-Sync on removeMember Error]", e)
+    );
+  } catch (sheetErr) {
+    console.error("[Google Sheet Auto-Sync Error]", sheetErr);
+  }
+
+  return { success: true };
+}
+
+/**
+ * Edit a member's details in an existing family (pre-pass-issue)
+ */
+export async function editMemberInFamily(
+  familyId: string,
+  memberId: string,
+  updates: { name?: string; gender?: "Male" | "Female"; type?: "Adult" | "Child" }
+) {
+  const store = getStore();
+  const family = store.families.find((f) => f.id === familyId);
+  if (!family) throw new Error("Family not found");
+
+  const event = store.events.find((e) => e.id === family.eventId);
+  if (!event) throw new Error("Event not found");
+  if (event.status === "PASSES_ISSUED" || event.status === "COMPLETED") {
+    throw new Error("Cannot edit family after passes have been issued.");
+  }
+
+  const member = family.members.find((m) => m.id === memberId);
+  if (!member) throw new Error("Member not found");
+
+  if (updates.name) member.name = updates.name.trim();
+  if (updates.gender) member.gender = updates.gender;
+  if (updates.type) member.type = updates.type;
+
+  // If member is HOF and name changed, update family hofName
+  if (member.isHof && updates.name) family.hofName = updates.name.trim();
+
+  saveStore(store);
+
+  if (isSupabaseConfigured()) {
+    const { url, key } = getSupabaseCredentials();
+    const authHeaders = { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
+    const patch: any = {};
+    if (updates.name) patch.name = updates.name.trim();
+    if (updates.gender) patch.gender = updates.gender;
+    if (updates.type) patch.type = updates.type;
+    await fetch(`${url}/rest/v1/members?id=eq.${member.id}`, {
+      method: "PATCH", headers: authHeaders, body: JSON.stringify(patch),
+    }).catch((e) => console.error("[Supabase editMember Error]", e));
+
+    if (member.isHof && updates.name) {
+      await fetch(`${url}/rest/v1/families?id=eq.${family.id}`, {
+        method: "PATCH", headers: authHeaders, body: JSON.stringify({ hof_name: updates.name.trim() }),
+      }).catch((e) => console.error("[Supabase editHof Error]", e));
+    }
+  }
+
+  try {
+    const exportData = getFormattedExportData(family.eventId);
+    syncFullStoreToGoogleSheet(exportData).catch((e) =>
+      console.error("[Google Sheet Auto-Sync on editMember Error]", e)
+    );
+  } catch (sheetErr) {
+    console.error("[Google Sheet Auto-Sync Error]", sheetErr);
+  }
+
+  return member;
+}
+
+/**
+ * Merge a separate HOF family into another family (delete the source HOF family, add their members)
+ * Used when a member's ITS ID is found as a separate HOF — merge them in.
+ */
+export async function mergeHofIntoFamily(
+  targetFamilyId: string,
+  sourceHofItsId: string
+) {
+  const store = getStore();
+  const targetFamily = store.families.find((f) => f.id === targetFamilyId);
+  if (!targetFamily) throw new Error("Target family not found");
+
+  const event = store.events.find((e) => e.id === targetFamily.eventId);
+  if (!event) throw new Error("Event not found");
+  if (event.status === "PASSES_ISSUED" || event.status === "COMPLETED") {
+    throw new Error("Cannot merge after passes have been issued.");
+  }
+
+  // Find source HOF family
+  const sourceFamilyIdx = store.families.findIndex((f) => f.hofItsId === sourceHofItsId && f.id !== targetFamilyId);
+  if (sourceFamilyIdx === -1) throw new Error("Source HOF family not found");
+  const sourceFamily = store.families[sourceFamilyIdx];
+
+  // Check no duplicate ITS IDs between the two families
+  const targetItsSet = new Set(targetFamily.members.map((m) => m.itsId));
+  for (const m of sourceFamily.members) {
+    if (targetItsSet.has(m.itsId)) throw new Error(`Duplicate ITS ID ${m.itsId} in both families.`);
+  }
+
+  // Move all members from source to target (mark all as non-HOF)
+  const movedMembers: FamilyMemberData[] = sourceFamily.members.map((m) => ({
+    ...m,
+    familyId: targetFamilyId,
+    isHof: false,
+  }));
+  targetFamily.members.push(...movedMembers);
+
+  // Delete source family
+  store.families.splice(sourceFamilyIdx, 1);
+  saveStore(store);
+
+  // Sync to Supabase: update members' family_id, delete source family
+  if (isSupabaseConfigured()) {
+    const { url, key } = getSupabaseCredentials();
+    const authHeaders = { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
+    await Promise.all([
+      // Update moved members in Supabase to point to target family
+      ...movedMembers.map((m) =>
+        fetch(`${url}/rest/v1/members?id=eq.${m.id}`, {
+          method: "PATCH", headers: authHeaders,
+          body: JSON.stringify({ family_id: targetFamilyId, is_hof: false }),
+        })
+      ),
+      // Delete source family row
+      fetch(`${url}/rest/v1/families?id=eq.${sourceFamily.id}`, { method: "DELETE", headers: authHeaders }),
+    ]).catch((e) => console.error("[Supabase mergeHof Error]", e));
+  }
+
+  try {
+    const exportData = getFormattedExportData(targetFamily.eventId);
+    syncFullStoreToGoogleSheet(exportData).catch((e) =>
+      console.error("[Google Sheet Auto-Sync on mergeHof Error]", e)
+    );
+  } catch (sheetErr) {
+    console.error("[Google Sheet Auto-Sync Error]", sheetErr);
+  }
+
+  return { success: true, mergedMembersCount: movedMembers.length };
+}
+
+/**
  * Cancel/Delete an individual registration (or entire family) by member ITS ID
  */
 export async function cancelMemberRegistration(
@@ -956,7 +1344,13 @@ export async function cancelMemberRegistration(
   let targetFamilyIndex = -1;
   let targetMemberIndex = -1;
 
+  const activeEvent = store.events.find((e) => e.isCurrent) || store.events[0];
+
   for (let fIdx = 0; fIdx < store.families.length; fIdx++) {
+    // Only cancel from the active event! Never touch past event history.
+    if (activeEvent && store.families[fIdx].eventId !== activeEvent.id) {
+      continue;
+    }
     const mIdx = store.families[fIdx].members.findIndex(
       (m) => m.itsId.trim() === cleanIts
     );
@@ -999,6 +1393,19 @@ export async function cancelMemberRegistration(
         fetch(`${url}/rest/v1/members?family_id=eq.${removedFamily.id}`, { method: "DELETE", headers: authHeaders }),
         fetch(`${url}/rest/v1/families?id=eq.${removedFamily.id}`, { method: "DELETE", headers: authHeaders }),
       ]).catch((e) => console.error("[Supabase Cancel Family Deletion Error]", e));
+    }
+
+    invalidateSupabaseCache();
+
+    if (activeEvent) {
+      try {
+        const exportData = getFormattedExportData(activeEvent.id);
+        syncFullStoreToGoogleSheet(exportData).catch((e) =>
+          console.error("[Google Sheet Auto-Sync on Cancel Family Error]", e)
+        );
+      } catch (sheetErr) {
+        console.error("[Google Sheet Auto-Sync Error]", sheetErr);
+      }
     }
 
     return {
@@ -1067,6 +1474,19 @@ export async function cancelMemberRegistration(
     }
 
     await Promise.all(reqs).catch((e) => console.error("[Supabase Cancel Member Deletion Error]", e));
+  }
+
+  invalidateSupabaseCache();
+
+  if (activeEvent) {
+    try {
+      const exportData = getFormattedExportData(activeEvent.id);
+      syncFullStoreToGoogleSheet(exportData).catch((e) =>
+        console.error("[Google Sheet Auto-Sync on Cancel Member Error]", e)
+      );
+    } catch (sheetErr) {
+      console.error("[Google Sheet Auto-Sync Error]", sheetErr);
+    }
   }
 
   return {
