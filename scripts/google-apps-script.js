@@ -4,27 +4,99 @@
  * Columns: ITS ID, Name, Status, Gender, Mobile Number, Mauze, Transportation, Niyaz Jaman, Niyaz Contribution
  */
 
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({ status: "healthy", service: "Khopoli Relay Google Sheets Sync" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.tryLock(10000); // Prevent concurrent write race conditions
 
   try {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
     var data = JSON.parse(e.postData.contents);
+    var eventName = data.eventName || "Zikrah Waaz Majlis 1448H";
+    var tabName = data.tabName || eventName || "Zikrah Waaz Majlis 1448H";
 
-    // 1. Full Sync Action (Clears sheet and writes formatted 2D array of all families)
-    if (data.action === "FULL_SYNC" && data.rows && data.rows.length > 0) {
+    // Explicitly target event tab (auto-create if it doesn't exist yet)
+    var sheet = ss.getSheetByName(tabName) || ss.getSheetByName(eventName);
+    if (!sheet) {
+      sheet = ss.insertSheet(tabName);
+    }
+
+    // 1. Full Sync Action (Clears sheet and writes formatted rectangular 2D array of all families)
+    if (data.action === "FULL_SYNC") {
       sheet.clearContents();
-      sheet.getRange(1, 1, data.rows.length, data.rows[0].length).setValues(data.rows);
-      if (data.rows.length >= 4) {
-        sheet.getRange(4, 1, 1, data.rows[0].length).setFontWeight("bold");
+      if (data.rows && data.rows.length > 0) {
+        var maxCols = 9;
+        for (var i = 0; i < data.rows.length; i++) {
+          if (data.rows[i] && data.rows[i].length > maxCols) {
+            maxCols = data.rows[i].length;
+          }
+        }
+        var rectRows = data.rows.map(function(r) {
+          var row = (r || []).slice();
+          while (row.length < maxCols) row.push("");
+          return row.slice(0, maxCols);
+        });
+        sheet.getRange(1, 1, rectRows.length, maxCols).setValues(rectRows);
+        if (rectRows.length >= 4) {
+          sheet.getRange(4, 1, 1, maxCols).setFontWeight("bold");
+        }
       }
-      return ContentService.createTextOutput(JSON.stringify({ status: "success", mode: "FULL_SYNC", totalRows: data.rows.length }))
+      return ContentService.createTextOutput(JSON.stringify({ status: "success", mode: "FULL_SYNC", totalRows: data.rows ? data.rows.length : 0, tab: sheet.getName() }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
+    // 2. Targeted Row Deletion Action (Deletes specific rows by ITS ID without clearing the sheet)
+    if (data.action === "DELETE_ITS" || data.action === "CANCEL_REGISTRATION") {
+      var itsList = data.itsIds || (data.itsId ? [data.itsId] : []);
+      var itsSet = {};
+      itsList.forEach(function(id) {
+        itsSet[String(id).replace(/\.0+$/, "").trim()] = true;
+      });
+
+      var lastRow = sheet.getLastRow();
+      var deletedCount = 0;
+      if (lastRow >= 5) {
+        var colAValues = sheet.getRange(1, 1, lastRow, 1).getValues();
+        for (var r = lastRow; r >= 5; r--) {
+          var val = String(colAValues[r - 1][0] || "").replace(/\.0+$/, "").trim();
+          if (val && itsSet[val]) {
+            sheet.deleteRow(r);
+            deletedCount++;
+          }
+        }
+      }
+
+      if (data.updatedHof && data.updatedHof.itsId) {
+        var newHofIts = String(data.updatedHof.itsId).replace(/\.0+$/, "").trim();
+        var curLastRow = sheet.getLastRow();
+        if (curLastRow >= 5) {
+          var checkA = sheet.getRange(5, 1, curLastRow - 4, 1).getValues();
+          for (var i = 0; i < checkA.length; i++) {
+            if (String(checkA[i][0]).replace(/\.0+$/, "").trim() === newHofIts) {
+              var targetRow = 5 + i;
+              sheet.getRange(targetRow, 3).setValue("HOF");
+              if (data.updatedHof.mobileNumber) {
+                sheet.getRange(targetRow, 5).setValue(data.updatedHof.mobileNumber);
+              }
+              break;
+            }
+          }
+        }
+      }
+
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        action: "DELETE_ITS",
+        deletedCount: deletedCount,
+        tab: sheet.getName()
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
     var family = data.family;
-    var eventName = data.eventName || "Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H";
 
     // 2. Set Sheet Header if sheet is completely empty
     if (sheet.getLastRow() === 0) {

@@ -5,10 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Calendar,
-  QrCode,
   Home,
   Menu,
-  X
+  X,
+  Settings2,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -21,12 +21,13 @@ export default function Navbar() {
   const navLinks = [
     { href: "/", label: "Home", icon: Home },
     { href: "/register", label: "Register Family", icon: Calendar, highlight: true },
+    { href: "/manage", label: "Manage Registration", icon: Settings2 },
   ];
 
   return (
     <header className="sticky top-0 z-50 navy-header text-white shadow-lg border-b-2 border-gold-600">
       <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Brand Logo with Custom Uploaded Image */}
+        {/* Brand Logo */}
         <Link
           href="/"
           onClick={closeMobileMenu}
@@ -44,12 +45,12 @@ export default function Navbar() {
               Anjuman E Najmi Khopoli
             </span>
             <span className="text-[10px] text-amber-200 font-bold tracking-wider uppercase">
-              Khopoli Relay Centre
+              Zikrah Waaz Majlis 1448H
             </span>
           </div>
         </Link>
 
-        {/* Desktop Navigation Links */}
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-2 text-xs sm:text-sm font-bold">
           <Link
             href="/"
@@ -62,6 +63,16 @@ export default function Navbar() {
           </Link>
 
           <Link
+            href="/manage"
+            className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1.5 ${
+              pathname === "/manage" ? "bg-white/20 text-white font-extrabold" : "hover:bg-white/10 text-cream-100"
+            }`}
+          >
+            <Settings2 className="w-4 h-4 text-gold-400" />
+            <span>Manage</span>
+          </Link>
+
+          <Link
             href="/register"
             className="px-3.5 py-1.5 rounded-lg bg-gold-600 hover:bg-gold-700 text-white font-black transition flex items-center gap-1.5 shadow-md border border-gold-400/40"
           >
@@ -70,7 +81,7 @@ export default function Navbar() {
           </Link>
         </nav>
 
-        {/* Mobile Hamburger Toggle Button */}
+        {/* Mobile Hamburger */}
         <button
           onClick={toggleMobileMenu}
           type="button"
@@ -81,13 +92,12 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Dropdown Drawer Menu */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-navy-950 border-t border-gold-600/40 p-4 space-y-2 animate-fade-in shadow-2xl">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href;
-
             return (
               <Link
                 key={link.href}
