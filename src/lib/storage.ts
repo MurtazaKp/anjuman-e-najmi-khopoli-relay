@@ -1172,7 +1172,7 @@ export async function addMemberToFamily(
 
   try {
     const exportData = getFormattedExportData(family.eventId);
-    syncFullStoreToGoogleSheet(exportData).catch((e) =>
+    await syncFullStoreToGoogleSheet(exportData).catch((e) =>
       console.error("[Google Sheet Auto-Sync on addMember Error]", e)
     );
   } catch (sheetErr) {
@@ -1212,7 +1212,7 @@ export async function removeMemberFromFamily(familyId: string, memberId: string)
 
   try {
     const exportData = getFormattedExportData(event.id);
-    syncFullStoreToGoogleSheet(exportData).catch((e) =>
+    await syncFullStoreToGoogleSheet(exportData).catch((e) =>
       console.error("[Google Sheet Auto-Sync on removeMember Error]", e)
     );
   } catch (sheetErr) {
@@ -1272,7 +1272,7 @@ export async function editMemberInFamily(
 
   try {
     const exportData = getFormattedExportData(family.eventId);
-    syncFullStoreToGoogleSheet(exportData).catch((e) =>
+    await syncFullStoreToGoogleSheet(exportData).catch((e) =>
       console.error("[Google Sheet Auto-Sync on editMember Error]", e)
     );
   } catch (sheetErr) {
@@ -1342,7 +1342,7 @@ export async function mergeHofIntoFamily(
 
   try {
     const exportData = getFormattedExportData(targetFamily.eventId);
-    syncFullStoreToGoogleSheet(exportData).catch((e) =>
+    await syncFullStoreToGoogleSheet(exportData).catch((e) =>
       console.error("[Google Sheet Auto-Sync on mergeHof Error]", e)
     );
   } catch (sheetErr) {
@@ -1410,11 +1410,16 @@ export async function cancelMemberRegistration(
         Authorization: `Bearer ${key}`,
         "Content-Type": "application/json",
       };
-      await Promise.all([
-        fetch(`${url}/rest/v1/passes?family_id=eq.${removedFamily.id}`, { method: "DELETE", headers: authHeaders }),
-        fetch(`${url}/rest/v1/members?family_id=eq.${removedFamily.id}`, { method: "DELETE", headers: authHeaders }),
-        fetch(`${url}/rest/v1/families?id=eq.${removedFamily.id}`, { method: "DELETE", headers: authHeaders }),
-      ]).catch((e) => console.error("[Supabase Cancel Family Deletion Error]", e));
+      try {
+        // Delete dependents first (passes and members) before deleting parent family to satisfy foreign key constraints
+        await Promise.all([
+          fetch(`${url}/rest/v1/passes?family_id=eq.${removedFamily.id}`, { method: "DELETE", headers: authHeaders }),
+          fetch(`${url}/rest/v1/members?family_id=eq.${removedFamily.id}`, { method: "DELETE", headers: authHeaders }),
+        ]);
+        await fetch(`${url}/rest/v1/families?id=eq.${removedFamily.id}`, { method: "DELETE", headers: authHeaders });
+      } catch (e) {
+        console.error("[Supabase Cancel Family Deletion Error]", e);
+      }
     }
 
     invalidateSupabaseCache();
@@ -1422,7 +1427,7 @@ export async function cancelMemberRegistration(
     if (activeEvent) {
       try {
         const exportData = getFormattedExportData(activeEvent.id);
-        syncFullStoreToGoogleSheet(exportData).catch((e) =>
+        await syncFullStoreToGoogleSheet(exportData).catch((e) =>
           console.error("[Google Sheet Auto-Sync on Cancel Family Error]", e)
         );
       } catch (sheetErr) {
@@ -1503,7 +1508,7 @@ export async function cancelMemberRegistration(
   if (activeEvent) {
     try {
       const exportData = getFormattedExportData(activeEvent.id);
-      syncFullStoreToGoogleSheet(exportData).catch((e) =>
+      await syncFullStoreToGoogleSheet(exportData).catch((e) =>
         console.error("[Google Sheet Auto-Sync on Cancel Member Error]", e)
       );
     } catch (sheetErr) {
