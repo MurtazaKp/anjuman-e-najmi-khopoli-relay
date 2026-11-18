@@ -707,10 +707,20 @@ export async function registerFamilyData(
       created_at: m.createdAt,
     }));
 
-    await Promise.all([
+    const [fRes, mRes] = await Promise.all([
       fetch(`${url}/rest/v1/families`, { method: "POST", headers: authHeaders, body: JSON.stringify(familyRow) }),
       fetch(`${url}/rest/v1/members`, { method: "POST", headers: authHeaders, body: JSON.stringify(memberRows) }),
-    ]).catch((err) => console.error("[Supabase Fast Insert Error]", err));
+    ]).catch((err) => {
+      console.error("[Supabase Fast Insert Network Error]", err);
+      return [null, null];
+    });
+
+    if (fRes && !fRes.ok) {
+      console.error("[Supabase Family Insert Error]", fRes.status, await fRes.text());
+    }
+    if (mRes && !mRes.ok) {
+      console.error("[Supabase Members Insert Error]", mRes.status, await mRes.text());
+    }
   }
 
   // Google Sheets webhook sync runs asynchronously in background so response is instant

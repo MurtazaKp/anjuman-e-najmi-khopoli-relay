@@ -52,7 +52,7 @@ export async function registerFamily(eventId: string, input: RegisterFamilyInput
   if (!store || store.families.length === 0) {
     await loadStoreFromSupabase();
   }
-  const result = registerFamilyData(eventId, input);
+  const result = await registerFamilyData(eventId, input);
   invalidateSupabaseCache(); // bust cache so next read is fresh
   return result;
 }

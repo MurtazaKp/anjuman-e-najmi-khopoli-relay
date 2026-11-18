@@ -25,7 +25,7 @@ export default function RootLayout({
         <footer className="bg-navy-950 text-slate-300 py-6 border-t-2 border-gold-600 text-center text-xs font-medium">
           <div className="max-w-4xl mx-auto px-4 space-y-2">
             <p className="font-extrabold text-amber-300 text-sm tracking-wide">Anjuman E Najmi Khopoli</p>
-            <p className="text-white">Urs Al-Dai Al-Ajal Syedna Mohammed Burhanuddin R.A. 1448H</p>
+            <p className="text-white">Zikrah Waaz Majlis 1448H</p>
             <p className="text-slate-400 text-[11px]">
               Khopoli Relay Centre · Digital Pass System
             </p>
