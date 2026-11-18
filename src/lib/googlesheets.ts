@@ -111,11 +111,21 @@ export function generateCSVString(eventName: string, familyGroups: FormattedFami
 /**
  * Live bulk sync to Google Sheets Webhook (Clears duplicates and rewrites formatted sheet)
  */
+const FALLBACK_GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycby-hVuY1hN3YoSUlIJSUDvO5efHzMd0GRmanWtwiPyJn13hcIr9IU3nfkjFC_tDkbXo/exec";
+
+export function getGoogleSheetWebhookUrl(): string {
+  const url = process.env.GOOGLE_SHEET_WEBHOOK_URL;
+  if (url && !url.includes("placeholder") && url.trim().length > 0) {
+    return url.trim();
+  }
+  return FALLBACK_GOOGLE_SHEET_WEBHOOK_URL;
+}
+
 export async function syncFullStoreToGoogleSheet(data: {
   eventName: string;
   familyGroups: FormattedFamilyGroup[];
 }) {
-  const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
+  const webhookUrl = getGoogleSheetWebhookUrl();
   if (!webhookUrl || webhookUrl.includes("placeholder")) {
     console.log("[Google Sheets Sync] Webhook URL not configured yet");
     return { success: true, synced: false, message: "Webhook URL not configured" };
@@ -159,7 +169,7 @@ export async function syncToGoogleSheetWebhook(data: {
   eventName: string;
   family: FormattedFamilyGroup;
 }) {
-  const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
+  const webhookUrl = getGoogleSheetWebhookUrl();
   if (!webhookUrl || webhookUrl.includes("placeholder")) {
     console.log("[Google Sheets Sync] Webhook URL not configured yet");
     return { success: true, synced: false, message: "Webhook URL not configured" };

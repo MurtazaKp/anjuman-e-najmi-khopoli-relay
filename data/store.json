@@ -60,6 +60,22 @@
   ],
   "families": [
     {
+      "id": "fam-1794981122183-4",
+      "eventId": "event-zikra-waaz-majlis-1447h",
+      "hofName": "Aliasgar Khopoliwala",
+      "hofItsId": "20393833",
+      "mobileNumber": "9403825153",
+      "mauze": "Khopoli",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "Yes, Jami ne Jaisu",
+      "niyazContribution": "7200",
+      "passLinkToken": "pass-1794981122183-9lgptf",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-11-18T05:52:02.183+00:00",
+      "members": []
+    },
+    {
       "id": "fam-1787810460910-178",
       "eventId": "event-urs-1448h",
       "hofName": "Sakina Shabbirhusain Munshi",
@@ -944,6 +960,34 @@
       ]
     },
     {
+      "id": "fam-1794982268215-586",
+      "eventId": "event-zikra-waaz-majlis-1447h",
+      "hofName": "Murtaza",
+      "hofItsId": "50499444",
+      "mobileNumber": "9484989898",
+      "mauze": "Lonavala",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "Yes, Jami ne Jaisu",
+      "niyazContribution": "7200",
+      "passLinkToken": "pass-1794982268215-iv4otg",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-11-18T06:11:08.215+00:00",
+      "members": [
+        {
+          "id": "mem-fam-1794982268215-586-1",
+          "familyId": "fam-1794982268215-586",
+          "eventId": "event-zikra-waaz-majlis-1447h",
+          "itsId": "50499444",
+          "name": "Murtaza",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-11-18T06:16:05.532+00:00"
+        }
+      ]
+    },
+    {
       "id": "fam-1787724390416-575",
       "eventId": "event-urs-1448h",
       "hofName": "HUSSAIN KACHWALA",
@@ -1335,56 +1379,6 @@
           "type": "Adult",
           "isHof": false,
           "createdAt": "2026-08-26T02:37:29.99+00:00"
-        }
-      ]
-    },
-    {
-      "id": "fam-1794979640868-182",
-      "eventId": "event-zikra-waaz-majlis-1447h",
-      "hofName": "Aliasgar Khopoliwala",
-      "hofItsId": "20393833",
-      "mobileNumber": "9403825153",
-      "mauze": "Khopoli",
-      "transportMode": "Car",
-      "rajabRozaCount": 0,
-      "niyazJaman": "Yes, Jami ne Jaisu",
-      "niyazContribution": "7200",
-      "passLinkToken": "pass-1794979640868-xcwdyb",
-      "whatsappStatus": "PENDING",
-      "createdAt": "2026-11-18T05:27:20.868+00:00",
-      "members": [
-        {
-          "id": "mem-fam-1794979640868-182-1",
-          "familyId": "fam-1794979640868-182",
-          "eventId": "event-zikra-waaz-majlis-1447h",
-          "itsId": "20393833",
-          "name": "Aliasgar Khopoliwala",
-          "gender": "Male",
-          "type": "Adult",
-          "isHof": true,
-          "createdAt": "2026-11-18T05:40:07.475+00:00"
-        },
-        {
-          "id": "mem-fam-1794979640868-182-2",
-          "familyId": "fam-1794979640868-182",
-          "eventId": "event-zikra-waaz-majlis-1447h",
-          "itsId": "50499558",
-          "name": "Murtaza Khopoliwala",
-          "gender": "Male",
-          "type": "Adult",
-          "isHof": false,
-          "createdAt": "2026-11-18T05:40:07.476+00:00"
-        },
-        {
-          "id": "mem-fam-1794979640868-182-3",
-          "familyId": "fam-1794979640868-182",
-          "eventId": "event-zikra-waaz-majlis-1447h",
-          "itsId": "50499560",
-          "name": "Tasneem Khopoliwala",
-          "gender": "Female",
-          "type": "Adult",
-          "isHof": false,
-          "createdAt": "2026-11-18T05:40:07.476+00:00"
         }
       ]
     },
@@ -3570,6 +3564,34 @@
       ]
     },
     {
+      "id": "fam-1787752066675-480",
+      "eventId": "event-urs-1448h",
+      "hofName": "Yunus thanwala",
+      "hofItsId": "30466145",
+      "mobileNumber": "9890234304",
+      "mauze": "Lonavala",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "Yes, Jami ne Jaisu",
+      "niyazContribution": "7200",
+      "passLinkToken": "pass-1787752066675-numqjm",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-08-26T13:47:46.675+00:00",
+      "members": [
+        {
+          "id": "mem-fam-1787752066675-480-1",
+          "familyId": "fam-1787752066675-480",
+          "eventId": "event-urs-1448h",
+          "itsId": "30466145",
+          "name": "Yunus thanwala",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-08-26T13:47:46.675+00:00"
+        }
+      ]
+    },
+    {
       "id": "fam-1787710475428-492",
       "eventId": "event-urs-1448h",
       "hofName": "Hussain Poonawalla",
@@ -4494,6 +4516,62 @@
           "type": "Adult",
           "isHof": true,
           "createdAt": "2026-08-27T03:53:35.205+00:00"
+        }
+      ]
+    },
+    {
+      "id": "fam-1787717668912-721",
+      "eventId": "event-urs-1448h",
+      "hofName": "Mohammed khuzaima Burhani",
+      "hofItsId": "60475558",
+      "mobileNumber": "8956673421",
+      "mauze": "Pune",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "Yes, Jami ne Jaisu",
+      "niyazContribution": "Je Imkaan Thase",
+      "passLinkToken": "pass-1787717668912-k352ke",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-08-26T04:14:28.912+00:00",
+      "members": [
+        {
+          "id": "mem-fam-1787717668912-721-1",
+          "familyId": "fam-1787717668912-721",
+          "eventId": "event-urs-1448h",
+          "itsId": "60475558",
+          "name": "Mohammed khuzaima Burhani",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-08-26T04:14:28.912+00:00"
+        }
+      ]
+    },
+    {
+      "id": "fam-1787737997999-345",
+      "eventId": "event-urs-1448h",
+      "hofName": "Shabana Rangwala",
+      "hofItsId": "40407616",
+      "mobileNumber": "9822190804",
+      "mauze": "Pune",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "Yes, Jami ne Jaisu",
+      "niyazContribution": "Je Imkaan Thase",
+      "passLinkToken": "pass-1787737997999-i6na68",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-08-26T09:53:17.999+00:00",
+      "members": [
+        {
+          "id": "mem-fam-1787737997999-345-1",
+          "familyId": "fam-1787737997999-345",
+          "eventId": "event-urs-1448h",
+          "itsId": "40407616",
+          "name": "Shabana Rangwala",
+          "gender": "Female",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-08-26T09:53:17.999+00:00"
         }
       ]
     },
@@ -8849,90 +8927,6 @@
           "type": "Adult",
           "isHof": false,
           "createdAt": "2026-08-26T04:28:11.512+00:00"
-        }
-      ]
-    },
-    {
-      "id": "fam-1787752066675-480",
-      "eventId": "event-urs-1448h",
-      "hofName": "Yunus thanwala",
-      "hofItsId": "30466145",
-      "mobileNumber": "9890234304",
-      "mauze": "Lonavala",
-      "transportMode": "Car",
-      "rajabRozaCount": 0,
-      "niyazJaman": "Yes, Jami ne Jaisu",
-      "niyazContribution": "7200",
-      "passLinkToken": "pass-1787752066675-numqjm",
-      "whatsappStatus": "PENDING",
-      "createdAt": "2026-08-26T13:47:46.675+00:00",
-      "members": [
-        {
-          "id": "mem-fam-1787752066675-480-1",
-          "familyId": "fam-1787752066675-480",
-          "eventId": "event-urs-1448h",
-          "itsId": "30466145",
-          "name": "Yunus thanwala",
-          "gender": "Male",
-          "type": "Adult",
-          "isHof": true,
-          "createdAt": "2026-08-26T13:47:46.675+00:00"
-        }
-      ]
-    },
-    {
-      "id": "fam-1787717668912-721",
-      "eventId": "event-urs-1448h",
-      "hofName": "Mohammed khuzaima Burhani",
-      "hofItsId": "60475558",
-      "mobileNumber": "8956673421",
-      "mauze": "Pune",
-      "transportMode": "Car",
-      "rajabRozaCount": 0,
-      "niyazJaman": "Yes, Jami ne Jaisu",
-      "niyazContribution": "Je Imkaan Thase",
-      "passLinkToken": "pass-1787717668912-k352ke",
-      "whatsappStatus": "PENDING",
-      "createdAt": "2026-08-26T04:14:28.912+00:00",
-      "members": [
-        {
-          "id": "mem-fam-1787717668912-721-1",
-          "familyId": "fam-1787717668912-721",
-          "eventId": "event-urs-1448h",
-          "itsId": "60475558",
-          "name": "Mohammed khuzaima Burhani",
-          "gender": "Male",
-          "type": "Adult",
-          "isHof": true,
-          "createdAt": "2026-08-26T04:14:28.912+00:00"
-        }
-      ]
-    },
-    {
-      "id": "fam-1787737997999-345",
-      "eventId": "event-urs-1448h",
-      "hofName": "Shabana Rangwala",
-      "hofItsId": "40407616",
-      "mobileNumber": "9822190804",
-      "mauze": "Pune",
-      "transportMode": "Car",
-      "rajabRozaCount": 0,
-      "niyazJaman": "Yes, Jami ne Jaisu",
-      "niyazContribution": "Je Imkaan Thase",
-      "passLinkToken": "pass-1787737997999-i6na68",
-      "whatsappStatus": "PENDING",
-      "createdAt": "2026-08-26T09:53:17.999+00:00",
-      "members": [
-        {
-          "id": "mem-fam-1787737997999-345-1",
-          "familyId": "fam-1787737997999-345",
-          "eventId": "event-urs-1448h",
-          "itsId": "40407616",
-          "name": "Shabana Rangwala",
-          "gender": "Female",
-          "type": "Adult",
-          "isHof": true,
-          "createdAt": "2026-08-26T09:53:17.999+00:00"
         }
       ]
     },
@@ -29748,28 +29742,6 @@
       "createdAt": "2026-08-26T03:50:04.498+00:00",
       "members": [
         {
-          "id": "mem-fam-1787716204498-640-1",
-          "familyId": "fam-1787716204498-640",
-          "eventId": "event-urs-1448h",
-          "itsId": "30375080",
-          "name": "Yusuf shk husain merchant",
-          "gender": "Male",
-          "type": "Adult",
-          "isHof": true,
-          "createdAt": "2026-08-26T03:50:04.498+00:00"
-        },
-        {
-          "id": "mem-fam-1787716204498-640-2",
-          "familyId": "fam-1787716204498-640",
-          "eventId": "event-urs-1448h",
-          "itsId": "50402139",
-          "name": "Arwa yusuf merchant",
-          "gender": "Female",
-          "type": "Adult",
-          "isHof": false,
-          "createdAt": "2026-08-26T03:50:04.498+00:00"
-        },
-        {
           "id": "mem-fam-1787716204498-640-3",
           "familyId": "fam-1787716204498-640",
           "eventId": "event-urs-1448h",
@@ -29786,6 +29758,28 @@
           "eventId": "event-urs-1448h",
           "itsId": "30927154",
           "name": "Jumana yusuf merchant",
+          "gender": "Female",
+          "type": "Adult",
+          "isHof": false,
+          "createdAt": "2026-08-26T03:50:04.498+00:00"
+        },
+        {
+          "id": "mem-fam-1787716204498-640-1",
+          "familyId": "fam-1787716204498-640",
+          "eventId": "event-urs-1448h",
+          "itsId": "30375080",
+          "name": "Yusuf shk husain merchant",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-08-26T03:50:04.498+00:00"
+        },
+        {
+          "id": "mem-fam-1787716204498-640-2",
+          "familyId": "fam-1787716204498-640",
+          "eventId": "event-urs-1448h",
+          "itsId": "50402139",
+          "name": "Arwa yusuf merchant",
           "gender": "Female",
           "type": "Adult",
           "isHof": false,
@@ -31047,6 +31041,45 @@
           "type": "Adult",
           "isHof": false,
           "createdAt": "2026-08-26T01:40:16.861+00:00"
+        }
+      ]
+    },
+    {
+      "id": "fam-1794982709306-856",
+      "eventId": "event-zikra-waaz-majlis-1447h",
+      "hofName": "Zikra Test Registration",
+      "hofItsId": "88889999",
+      "mobileNumber": "9876543210",
+      "mauze": "Khopoli",
+      "transportMode": "Car",
+      "rajabRozaCount": 0,
+      "niyazJaman": "Yes, Jami ne Jaisu",
+      "niyazContribution": "1000",
+      "passLinkToken": "pass-1794982709306-wqyvlq",
+      "whatsappStatus": "PENDING",
+      "createdAt": "2026-11-18T06:18:29.307Z",
+      "members": [
+        {
+          "id": "mem-fam-1794982709306-856-1",
+          "familyId": "fam-1794982709306-856",
+          "eventId": "event-zikra-waaz-majlis-1447h",
+          "itsId": "88889999",
+          "name": "Zikra Test Registration",
+          "gender": "Male",
+          "type": "Adult",
+          "isHof": true,
+          "createdAt": "2026-11-18T06:18:29.307Z"
+        },
+        {
+          "id": "mem-fam-1794982709306-856-2",
+          "familyId": "fam-1794982709306-856",
+          "eventId": "event-zikra-waaz-majlis-1447h",
+          "itsId": "88889998",
+          "name": "Zikra Test Member",
+          "gender": "Female",
+          "type": "Adult",
+          "isHof": false,
+          "createdAt": "2026-11-18T06:18:29.307Z"
         }
       ]
     }

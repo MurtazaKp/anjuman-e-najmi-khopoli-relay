@@ -707,24 +707,36 @@ export async function registerFamilyData(
       created_at: m.createdAt,
     }));
 
-    const [fRes, mRes] = await Promise.all([
-      fetch(`${url}/rest/v1/families`, { method: "POST", headers: authHeaders, body: JSON.stringify(familyRow) }),
-      fetch(`${url}/rest/v1/members`, { method: "POST", headers: authHeaders, body: JSON.stringify(memberRows) }),
-    ]).catch((err) => {
-      console.error("[Supabase Fast Insert Network Error]", err);
-      return [null, null];
-    });
+    try {
+      // 1. Insert family row first so foreign key constraint (members_family_id_fkey) is satisfied
+      const fRes = await fetch(`${url}/rest/v1/families`, {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify(familyRow),
+      });
 
-    if (fRes && !fRes.ok) {
-      console.error("[Supabase Family Insert Error]", fRes.status, await fRes.text());
-    }
-    if (mRes && !mRes.ok) {
-      console.error("[Supabase Members Insert Error]", mRes.status, await mRes.text());
+      if (!fRes.ok) {
+        console.error("[Supabase Family Insert Error]", fRes.status, await fRes.text());
+      } else {
+        // 2. Insert member rows sequentially after family is committed
+        if (memberRows.length > 0) {
+          const mRes = await fetch(`${url}/rest/v1/members`, {
+            method: "POST",
+            headers: authHeaders,
+            body: JSON.stringify(memberRows),
+          });
+          if (!mRes.ok) {
+            console.error("[Supabase Members Insert Error]", mRes.status, await mRes.text());
+          }
+        }
+      }
+    } catch (err) {
+      console.error("[Supabase Fast Insert Network Error]", err);
     }
   }
 
-  // Google Sheets webhook sync runs asynchronously in background so response is instant
-  syncToGoogleSheetWebhook({
+  // Await Google Sheets sync so Vercel Serverless Function does not freeze before HTTP request finishes
+  await syncToGoogleSheetWebhook({
     eventName: event.name,
     family: formattedGroup,
   }).catch((err) => console.error("[Google Sheets Sync Error]", err));
