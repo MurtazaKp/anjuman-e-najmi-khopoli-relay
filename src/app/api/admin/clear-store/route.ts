@@ -31,17 +31,50 @@ export async function POST(req: Request) {
     }
 
     const store = getStore();
-    store.families = [];
-    store.passes = [];
-    if (store.events.length > 0) {
-      store.events[0].status = "REGISTRATION_OPEN";
+    const { getFormattedExportData } = await import("@/lib/storage");
+    const { syncFullStoreToGoogleSheet } = await import("@/lib/googlesheets");
+    const { isSupabaseConfigured, getSupabaseCredentials } = await import("@/lib/supabase");
+
+    const activeEvent = store.events.find((e) => e.isCurrent) || store.events[0];
+    const eventId = activeEvent?.id;
+
+    if (eventId) {
+      // Clear ONLY registrations and passes for the active event (Preserve past event history!)
+      store.families = store.families.filter((f) => f.eventId !== eventId);
+      store.passes = store.passes.filter((p) => p.eventId !== eventId);
+
+      const evt = store.events.find((e) => e.id === eventId);
+      if (evt) {
+        evt.status = "REGISTRATION_OPEN";
+      }
+
+      saveStore(store, { skipSupabaseBulkSync: true });
+      await clearSupabaseStore(eventId);
+
+      // Reset event status in Supabase
+      if (isSupabaseConfigured()) {
+        const { url, key } = getSupabaseCredentials();
+        await fetch(`${url}/rest/v1/events?id=eq.${eventId}`, {
+          method: "PATCH",
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: "REGISTRATION_OPEN" }),
+        }).catch((e) => console.error("[Supabase Event Status Reset Error]", e));
+      }
+
+      // Sync clean empty state to Google Sheet tab
+      const exportData = getFormattedExportData(eventId);
+      await syncFullStoreToGoogleSheet(exportData).catch((e) =>
+        console.error("[Google Sheet Clear Error]", e)
+      );
     }
-    saveStore(store);
-    await clearSupabaseStore();
 
     return NextResponse.json({
       success: true,
-      message: "All registrations and passes cleared successfully.",
+      message: `Registrations and passes for ${activeEvent?.name || "active event"} cleared successfully.`,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

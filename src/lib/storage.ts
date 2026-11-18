@@ -344,16 +344,22 @@ export async function loadStoreFromSupabase(): Promise<AppStore | null> {
 /**
  * Clear all families, members, and passes from Supabase PostgreSQL
  */
-export async function clearSupabaseStore() {
+export async function clearSupabaseStore(eventId?: string) {
   if (!isSupabaseConfigured()) return;
   const client = getSupabaseClient();
   if (!client) return;
 
   try {
-    // Delete all records from passes, members, and families
-    await client.from("passes").delete().neq("id", "_none_");
-    await client.from("members").delete().neq("id", "_none_");
-    await client.from("families").delete().neq("id", "_none_");
+    if (eventId) {
+      // Child-first deletion order to satisfy foreign keys
+      await client.from("passes").delete().eq("event_id", eventId);
+      await client.from("members").delete().eq("event_id", eventId);
+      await client.from("families").delete().eq("event_id", eventId);
+    } else {
+      await client.from("passes").delete().neq("id", "_none_");
+      await client.from("members").delete().neq("id", "_none_");
+      await client.from("families").delete().neq("id", "_none_");
+    }
   } catch (err) {
     console.error("[Supabase Clear Error]", err);
   }
